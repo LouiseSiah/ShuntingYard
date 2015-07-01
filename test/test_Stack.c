@@ -1,7 +1,8 @@
 #include "unity.h"
 #include "Stack.h"
-#include "malloc.h"
-#include "stdio.h"
+#include <malloc.h>
+#include <stdio.h>
+#include "mock_Token.h"
 
 void setUp(void){}
 void tearDown(void){}
@@ -18,7 +19,7 @@ void tearDown(void){}
  */
 void test_stackCreate_should_return_Non_NULL_Stack_with_all_fields_cleared()
 {
-  Stack *stack = malloc (sizeof(Stack));
+  List *stack = malloc (sizeof(List));
   stack = stackCreate();
 	TEST_ASSERT_NOT_NULL(stack);
   TEST_ASSERT_NULL(stack->head);
@@ -76,13 +77,11 @@ void test_elementCreate_given_1_into_element_should_return_1()
 void test_stackAdd_insert_given_empty_stack_then_add_empty_should_ignore_the_element()
 {
   int value0 = 0;
-  Stack *stack = stackCreate();
-  Element *element = elementCreate(&value0);
+  List *stack = stackCreate();
 
-  stackAdd(stack, element);
+  stackPush(stack, &value0);
 
   TEST_ASSERT_NOT_NULL(stack);
-  TEST_ASSERT_NOT_NULL(element);
   TEST_ASSERT_NULL(stack->head);
   TEST_ASSERT_NULL(stack->tail);
 }
@@ -118,16 +117,14 @@ void test_stackAdd_insert_given_empty_stack_then_add_empty_should_ignore_the_ele
 void test_stackAdd_given_empty_stack_then_add_1_should_add_element_1_into_the_stack()
 {
   int value1 = 1;
-  Stack *stack = stackCreate();
-  Element *element = elementCreate(&value1);
+  List *stack = stackCreate();
 
-  stackAdd(stack, element);
+  stackPush(stack, &value1);
 
   TEST_ASSERT_NOT_NULL(stack);
-  TEST_ASSERT_NOT_NULL(element);
   TEST_ASSERT_EQUAL(value1, *((int *)(stack->head->data)));
   TEST_ASSERT_EQUAL(value1, *((int *)(stack->tail->data)));
-  TEST_ASSERT_EQUAL(value1, stack->length);
+  TEST_ASSERT_EQUAL(1, stack->length);
   TEST_ASSERT_NULL(stack->tail->next);
 }
 
@@ -162,122 +159,20 @@ void test_stackAdd_given_empty_stack_then_add_1_should_add_element_1_into_the_st
  */
 void test_stackAdd_given_empty_stack_then_create_2_element_should_add_the_2_elements_into_the_stack()
 {
-  int firstValue = 1,
-      topValue = 2;
+  int value1 = 1,
+      value2 = 2;
 
-  Stack *stack = stackCreate();
-  Element *element = malloc(sizeof(Element));
-  element = elementCreate(&firstValue);
-  stackAdd(stack, element);
-  element = elementCreate(&topValue);
-  stackAdd(stack, element);
+  List *stack = stackCreate();
+  stackPush(stack, &value1);
+  stackPush(stack, &value2);
 
   TEST_ASSERT_NOT_NULL(stack);
-  TEST_ASSERT_NOT_NULL(element);
-  TEST_ASSERT_EQUAL(topValue, *((int *)(stack->head->data)));
-  TEST_ASSERT_EQUAL(firstValue, *((int *)(stack->tail->data)));
+  TEST_ASSERT_EQUAL(value2, *((int *)(stack->head->data)));
+  TEST_ASSERT_EQUAL(value1, *((int *)(stack->tail->data)));
   TEST_ASSERT_EQUAL(2, stack->length);
   TEST_ASSERT_NULL(stack->tail->next);
 }
 
-/* ADD   
- *
- *        -----------                                     ---------------
- *        |    0    |----           |                 -----|  HEAD| TAIL |----
- *        -----------   |           |                 |   ---------------    |
- *                      |      ---- + ----           \/                     \/
- *                     \/           |               ----                 ----
- *                   -------        |              | 1 | -------------->| 2 |
- *                    -----                        ----                 ----
- *                     --                                                |
- *                                                                      \/
- *                                                                    -------
- *                                                                      ----
- *                                                                       --
- * RESULT
- *                      ---------------
- *                -----|  HEAD| TAIL  |---
- *               |     ---------------   |
- *              \/                      \/
- *            -------                 ------
- *           |   1  |--------------> |  2  | --------------
- *           -------                 -------              |
- *                                                        |
- *                                                       \/
- *                                                     ------
- *                                                      ----
- *                                                       --
- *
- *
- */
-/*// void test_stackAdd_2_element_stack_then_add_empty_element_should_remain_unchanged()
-// {
-  // int firstValue = 1,
-      // topValue = 2;
-
-  // Stack *stack = malloc (sizeof(Stack));
-  // stack = stackCreate();
-  // Element *element = malloc(sizeof(Element));
-  // element = elementCreate(firstValue);
-  // stackAdd(stack, element);
-  // element = elementCreate(topValue);
-  // stackAdd(stack, element);
-  // element = elementCreate(0);
-  // stackAdd(stack, element);
-
-  // TEST_ASSERT_NOT_NULL(stack);
-  // TEST_ASSERT_NOT_NULL(element);
-  // TEST_ASSERT_EQUAL(topValue, stack->head->data);
-  // TEST_ASSERT_EQUAL(firstValue, stack->tail->data);
-  // TEST_ASSERT_EQUAL(2, stack->length);
-  // TEST_ASSERT_NULL(stack->tail->next);
-// }
-*/
-
-/* 
- *                      ---------------
- *                -----|  HEAD| TAIL  |-----------------------------------
- *               |     ---------------                                   |
- *              \/                                                      \/
- *            -------     ------    -------                           ------ 
- *           |   1  |--->|  2  |--->|  3  |---> . . . . . . . . ---> |  99  |
- *           -------     ------     -------                          -------
- *                                                                      |
- *                                                                     \/
- *                                                                   ------
- *                                                                    ----
- *                                                                     --
- */
-/*// void test_stackAdd_given_empty_stack_then_create_99_element_should_add_the_99_elements_into_the_stack()
-// {
-  // int i,
-      // firstValue = 1,
-      // topValue = 99;
-
-  // Stack *stack = malloc (sizeof(Stack));
-  // stack = stackCreate();
-  // Element *element = malloc(sizeof(Element));
-
-  // for(i = firstValue; i <= topValue; i++)
-  // {
-    // element = elementCreate(i);
-    // stackAdd(stack, element);
-
-    // TEST_ASSERT_NOT_NULL(element);
-    // TEST_ASSERT_EQUAL(i, stack->head->data);
-    // TEST_ASSERT_EQUAL(firstValue, stack->tail->data);
-    // TEST_ASSERT_EQUAL(i, stack->length);
-    // TEST_ASSERT_NULL(stack->tail->next);
-  // }
-
-  // TEST_ASSERT_NOT_NULL(stack);
-  // TEST_ASSERT_EQUAL(topValue, stack->head->data);
-  // TEST_ASSERT_EQUAL(firstValue, stack->tail->data);
-  // TEST_ASSERT_EQUAL(topValue, stack->length);
-  // TEST_ASSERT_NULL(stack->tail->next);
-
-// }
-*/
 
 /**************BEFORE and AFTER************
  *                ---------------
@@ -294,10 +189,13 @@ void test_stackAdd_given_empty_stack_then_create_2_element_should_add_the_2_elem
  */
 void test_stackRemove_given_empty_stack_then_do_nothing_should_return_NULL()
 {
-  Stack *stack = stackCreate();
-  stackRemove(stack);
+  List *stack = stackCreate();
+  OperatorToken *op = malloc(sizeof (OperatorToken) + sizeof(Token *) * 2);
+  
+  op = (OperatorToken *)stackPop(stack);
 
  	TEST_ASSERT_NOT_NULL(stack);
+  TEST_ASSERT_NULL(op);
   TEST_ASSERT_NULL(stack->head);
   TEST_ASSERT_NULL(stack->tail);
   TEST_ASSERT_EQUAL(0, stack->length);
@@ -342,21 +240,21 @@ void test_stackRemove_given_empty_stack_then_do_nothing_should_return_NULL()
  */
 void test_stackRemove_given_one_element_stack_then_remove_the_only_element_should_return_NULL()
 {
-  int value1 = 1;
-  Stack *stack = stackCreate();
-  Element *element = malloc(sizeof(Element));
-  element = elementCreate(&value1);
- 
-  stackAdd(stack, element);
-  Element *elemRemove = malloc(sizeof(Element));
-  elemRemove = stackRemove(stack);
+  IntegerToken *int1 = malloc(sizeof (IntegerToken));
+  IntegerToken *intRemove = malloc(sizeof (IntegerToken));
+  int1->type = TOKEN_INTEGER_TYPE;
+  int1->value = 1;
+  
+  List *stack = stackCreate();
+  
+  stackPush(stack, int1);
+  intRemove = (IntegerToken *)stackPop(stack);
 
-  TEST_ASSERT_NOT_NULL(element);
   TEST_ASSERT_NOT_NULL(stack);
   TEST_ASSERT_NULL(stack->head);
   TEST_ASSERT_NULL(stack->tail);
   TEST_ASSERT_EQUAL(0, stack->length);
-  TEST_ASSERT_EQUAL(value1, *((int *)(elemRemove->data)));
+  TEST_ASSERT_EQUAL(1, intRemove->value);
 }
 
 /***********************BEFORE*****************************************
@@ -403,18 +301,18 @@ void test_stackRemove_given_one_element_stack_then_remove_the_only_element_shoul
  *
  *
  */
-void test_stackRemove_given_two_elements_stack_then_remove_the_top_element_should_return_first_element()
+/*void test_stackRemove_given_two_elements_stack_then_remove_the_top_element_should_return_first_element()
 {
   int topValue = 2,
       firstValue = 1;
   
-  Stack *stack = stackCreate();
+  List *stack = stackCreate();
   Element *element = malloc(sizeof(Element));
   element = elementCreate(&firstValue);
-  stackAdd(stack, element);
+  stackPush(stack, element);
   element = elementCreate(&topValue);
-  stackAdd(stack, element);
-  Element *elemRemove = stackRemove(stack);
+  stackPush(stack, element);
+  Element *elemRemove = stackPop(stack);
 
   TEST_ASSERT_NOT_NULL(element);
   TEST_ASSERT_NOT_NULL(stack);
@@ -464,17 +362,17 @@ void test_stackRemove_given_two_elements_stack_then_remove_the_top_element_shoul
 // void test_stackRemove_given_three_elements_stack_then_remove_the_top_element_should_return_remain_stack()
 // {
   // Element *elemRemove = malloc(sizeof(Element));
-  // Stack *stack = malloc (sizeof(Stack));
+  // List *stack = malloc (sizeof(List));
   // stack = stackCreate();
   // Element *element1 = elementCreate(1),
                // *element2 = elementCreate(2),
                // *element3 = elementCreate(3);
 
-  // stackAdd(stack, element1);
-  // stackAdd(stack, element2);
-  // stackAdd(stack, element3);
+  // stackPush(stack, element1);
+  // stackPush(stack, element2);
+  // stackPush(stack, element3);
 
-  // elemRemove = stackRemove(stack);
+  // elemRemove = stackPop(stack);
 
   // TEST_ASSERT_NOT_NULL(elemRemove);
   // TEST_ASSERT_NOT_NULL(stack);
@@ -537,18 +435,18 @@ void test_stackRemove_given_two_elements_stack_then_remove_the_top_element_shoul
   // int value1 = 1,
       // value2 = 2,
       // value3 = 3;
-  // Stack *stack = malloc (sizeof(Stack));
+  // List *stack = malloc (sizeof(List));
   // stack = stackCreate();
   // Element *element = malloc(sizeof(Element));
   // element = elementCreate(value1);
-  // stackAdd(stack, element);
+  // stackPush(stack, element);
   // element = elementCreate(value2);
-  // stackAdd(stack, element);
+  // stackPush(stack, element);
   // element = elementCreate(value3);
-  // stackAdd(stack, element);
+  // stackPush(stack, element);
 
-  // Element *elemRemove1 = stackRemove(stack);
-  // Element *elemRemove2 = stackRemove(stack);
+  // Element *elemRemove1 = stackPop(stack);
+  // Element *elemRemove2 = stackPop(stack);
   
   // TEST_ASSERT_NOT_NULL(elemRemove1);
   // TEST_ASSERT_NOT_NULL(elemRemove2);

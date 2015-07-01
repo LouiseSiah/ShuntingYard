@@ -1,11 +1,12 @@
 #include "Stack.h"
-#include "stdio.h"
-#include "malloc.h"
+#include <stdio.h>
+#include <malloc.h>
 #include <assert.h>
+#include "Token.h"
 
-Stack *stackCreate()
+List *stackCreate()
 {
-  Stack *stack = malloc(sizeof(Stack));
+  List *stack = malloc(sizeof(List));
   assert(stack != NULL); //only use it in production code, not in test code
   
   stack->head = NULL;
@@ -26,9 +27,11 @@ Element *elementCreate(void *data)
   return elem;
 }
 
-void stackAdd(Stack *stack, Element *elem)
+void stackPush(List *stack, void *data) 
 {
-  if(*((int *)(elem->data)) == 0)
+  Element *elem = elementCreate(data);
+  
+  if( *((int *)data) == 0)
   {}
   else
   {
@@ -46,7 +49,7 @@ void stackAdd(Stack *stack, Element *elem)
   }
 }
 
-Element *stackRemove(Stack *stack)
+Token *stackPop(List *stack)
 {
   Element *del,
           *elemRemove = malloc(sizeof(Element));
@@ -69,7 +72,7 @@ Element *stackRemove(Stack *stack)
     stack->length = 0;
   }
   
-  return elemRemove;
+  return ((Token *)elemRemove->data);
 }
 
 

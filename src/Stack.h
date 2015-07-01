@@ -2,6 +2,7 @@
 #define Stack_H
 
 #include "unity.h"
+#include "Token.h"
 
 // #define CUSTOM_TEST_FAIL(lineNo, msg, ...)                                                   \
           // {                                                                           \
@@ -30,20 +31,13 @@ typedef struct
   Element *head;
   Element *tail;
   int length;
-} Stack;
+} List;
 
-Stack *stackCreate();
+List *stackCreate();
 Element *elementCreate(void *data);
-void stackAdd(Stack *stack, Element *elem);
-Element *stackRemove(Stack *stack);
-//void elementDestroy(Element *elem);
+void stackPush(List *stack, void *data);
+Token *stackPop(List *stack);
 
-//oldS
-
-// Stack *stackCreate();
-// Element *stackElementCreate(int data);
-// void stackAdd(Stack *stack, Element *elem);
-// Element *stackRemove(Stack *stack);
 
 #endif // Stack_H
 

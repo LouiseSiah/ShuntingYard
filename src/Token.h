@@ -2,7 +2,12 @@
 #define Token_H
 
 #include <stdint.h>
-
+//size of Token = 12
+//IntegerToken = 16
+//FloatToken = 24
+//IdentifierToken = 16
+//StringToken = 16
+//OperatorToken = 20
 typedef enum {
 	TOKEN_UNKNOWN_TYPE,
 	TOKEN_INTEGER_TYPE,
@@ -62,5 +67,7 @@ typedef struct {
 
 Token *createOperatorToken(char *symbol, Arity AR);
 Token *createIntegerToken(int value);
+Token *getToken();
+Token *_getToken();
 
 #endif // Token_H
