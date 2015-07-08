@@ -62,12 +62,13 @@ typedef struct {
   uint32_t length;
 	char *symbol;
 	Arity arity;
+  Associativity assoc;
+  uint32_t precedence;
 	Token *token[0];
 } OperatorToken;
 
-Token *createOperatorToken(char *symbol, Arity AR);
+Token *createOperatorToken(char *symbol);
 Token *createIntegerToken(int value);
 Token *getToken();
-Token *_getToken();
 
 #endif // Token_H
