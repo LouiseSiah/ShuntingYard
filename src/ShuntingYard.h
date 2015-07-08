@@ -7,6 +7,7 @@
 void comparePlusOperators(OperatorToken **token);
 void compareMinusOperators(OperatorToken **token);
 void compareAsteriskOperators(OperatorToken **token);
+void compareDivideOperators(OperatorToken **token);
 Token *_getToken();
 
 
