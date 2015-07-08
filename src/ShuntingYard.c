@@ -42,8 +42,8 @@ void comparePlusOperators(OperatorToken **token) // + is pre = 4, left-to-right,
 {
   // printf("symbol+ = %d\n", '+');
   // printf("symboltoken = %d (**token)\n", *(*token)->symbol);
-  printf("symboltoken = %s (**token)\n", (*token)->symbol);
-  printf("symboltoken = %s (**token)\n", ((*token)->symbol+1));
+  //printf("symboltoken = %s (**token)\n", (*token)->symbol);
+  //printf("symboltoken = %s (**token)\n", ((*token)->symbol+1));
   
   //if((int) *(*token)->symbol == '+') //must be '+' cannot "+"
   if((int) *(*token)->symbol == '+' && (int) *((*token)->symbol+1) == 0) 
@@ -64,11 +64,8 @@ void comparePlusOperators(OperatorToken **token) // + is pre = 4, left-to-right,
 
 void compareMinusOperators(OperatorToken **token) // - is pre = 4, left-to-right, arity = infix
 {
-  // printf("symbol'-' = %d\n", '+');
-  // printf("symboltoken = %d (**token)\n", *(*token)->symbol);
-  // printf("symboltoken = %s (**token)\n", (*token)->symbol);
-  
-  if( *(*token)->symbol == '-') //must be '-' cannot "-"
+  //printf("HEllo, I am Minus Function.\n");
+  if((int) *(*token)->symbol == '-' && (int) *((*token)->symbol+1) == 0) 
   { 
     (*token)->arity = INFIX;
     (*token)->precedence = 4;
@@ -77,9 +74,21 @@ void compareMinusOperators(OperatorToken **token) // - is pre = 4, left-to-right
   //else if (=="++")
 }
 
-void compareAsteriskOperators(OperatorToken **token) // * is pre = 4, left-to-right, arity = infix
+void compareAsteriskOperators(OperatorToken **token) // * is pre = 3, left-to-right, arity = infix
 {
-  if( *(*token)->symbol == '*') //must be '-' cannot "-"
+  if((int) *(*token)->symbol == '*' && (int) *((*token)->symbol+1) == 0) 
+  { 
+    (*token)->arity = INFIX;
+    (*token)->precedence = 3;
+    (*token)->assoc = LEFT_TO_RIGHT;
+  }
+  //else if (=="++")
+}
+
+void compareDivideOperators(OperatorToken **token) // * is pre = 3, left-to-right, arity = infix
+{
+  //printf("symboltoken = %s (**token)\n", (*token)->symbol);
+  if((int) *(*token)->symbol == '/' && (int) *((*token)->symbol+1) == 0) 
   { 
     (*token)->arity = INFIX;
     (*token)->precedence = 3;
@@ -98,8 +107,8 @@ Token *_getToken()  //assign attributes
     { 
       case'+': comparePlusOperators((OperatorToken **)&token); break;
       case'-': compareMinusOperators((OperatorToken **)&token); break;
-      case'*':break;
-      case'/':break;
+      case'*': compareAsteriskOperators((OperatorToken **)&token); break;
+      case'/': compareDivideOperators((OperatorToken **)&token); break;
       default:break;
     }
     
