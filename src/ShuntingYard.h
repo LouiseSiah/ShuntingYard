@@ -5,6 +5,8 @@
 #include "Token.h"
 
 void comparePlusOperators(OperatorToken **token);
+void compareMinusOperators(OperatorToken **token);
+void compareAsteriskOperators(OperatorToken **token);
 Token *_getToken();
 
 
