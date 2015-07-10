@@ -5,30 +5,6 @@
 #include "ErrorObject.h"
 #include "CException.h"
 
-// typedef enum {
-	// PREFIX, //-2
-	// INFIX,	//2*2
-	// POSTFIX	//x++
-// } Arity;
-
-// typedef enum {
-	// NONE,
-	// LEFT_TO_RIGHT,
-	// RIGHT_TO_LEFT,
-// } Associativity;
-
-// typedef struct {
-	// TokenType type;
-  // uint32_t startColumn;
-  // uint32_t length;
-	// char *symbol;
-	// Arity arity;
-  // Associativity assoc;
-  // uint32_t precedence;
-	// Token *token[0];
-// } OperatorToken;
-
-
 void comparePlusOperators(OperatorToken **token) // + is pre = 4, left-to-right, arity = infix
 {
   // printf("symbol+ = %d\n", '+');
@@ -170,8 +146,8 @@ void tryConvertToPrefix(Token **token)
           && (int) *(((OperatorToken *) *token)->symbol + 1) == 0)
   {
     ((OperatorToken *) *token)->arity = PREFIX;
-    ((OperatorToken *) *token)->precedence = 2;
-    ((OperatorToken *) *token)->assoc = RIGHT_TO_LEFT;
+    ((OperatorToken *) *token)->precedence = 1;
+    ((OperatorToken *) *token)->assoc = LEFT_TO_RIGHT;
   }
   
   else

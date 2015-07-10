@@ -165,20 +165,8 @@ void test_tryConvertToPrefix_given_plus_should_convert_to_prefix_successfully(vo
   
   getToken_ExpectAndReturn((Token *)op);
   op = (OperatorToken *)_getToken();
-  
-  
-  // printf("op symbol = %s\n", op->symbol);
-  // printf("arity before = %d\n",op->arity);
-  // printf("precedence before = %d\n",op->precedence);
-  // printf("assoc before = %d\n",op->assoc);
-  
-  // printf("op symbol = %d\n", *op->symbol);
 
   tryConvertToPrefix((Token **)&op);
-  
-  // printf("arity after = %d\n",op->arity);
-  // printf("precedence after = %d\n",op->precedence);
-  // printf("assoc after = %d\n",op->assoc);
   
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
@@ -194,25 +182,81 @@ void test_tryConvertToPrefix_given_plus_plus_should_convert_to_prefix_successful
   
   getToken_ExpectAndReturn((Token *)op);
   op = (OperatorToken *)_getToken();
-  
-  
-  // printf("op symbol = %s\n", op->symbol);
-  // printf("arity before = %d\n",op->arity);
-  // printf("precedence before = %d\n",op->precedence);
-  // printf("assoc before = %d\n",op->assoc);
-  
-  // printf("op symbol = %d\n", *op->symbol);
 
   tryConvertToPrefix((Token **)&op);
-  
-  // printf("arity after = %d\n",op->arity);
-  // printf("precedence after = %d\n",op->precedence);
-  // printf("assoc after = %d\n",op->assoc);
   
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
   TEST_ASSERT_EQUAL(2, op->precedence);
   TEST_ASSERT_EQUAL_PTR("++", op->symbol); 
+}
+
+void test_tryConvertToPrefix_given_minus_should_convert_to_prefix_successfully(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "-";
+  
+  getToken_ExpectAndReturn((Token *)op);
+  op = (OperatorToken *)_getToken();
+
+  tryConvertToPrefix((Token **)&op);
+  
+  TEST_ASSERT_EQUAL(PREFIX, op->arity);
+  TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
+  TEST_ASSERT_EQUAL(2, op->precedence);
+  TEST_ASSERT_EQUAL_PTR("-", op->symbol); 
+}
+
+void test_tryConvertToPrefix_given_logicalNOT_should_convert_to_prefix_successfully(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "!";
+  
+  getToken_ExpectAndReturn((Token *)op);
+  op = (OperatorToken *)_getToken();
+
+  tryConvertToPrefix((Token **)&op);
+
+  TEST_ASSERT_EQUAL(PREFIX, op->arity);
+  TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
+  TEST_ASSERT_EQUAL(2, op->precedence);
+  TEST_ASSERT_EQUAL_PTR("!", op->symbol); 
+}
+
+void test_tryConvertToPrefix_given_bitwiseNOT_should_convert_to_prefix_successfully(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "~";
+  
+  getToken_ExpectAndReturn((Token *)op);
+  op = (OperatorToken *)_getToken();
+
+  tryConvertToPrefix((Token **)&op);
+
+  TEST_ASSERT_EQUAL(PREFIX, op->arity);
+  TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
+  TEST_ASSERT_EQUAL(2, op->precedence);
+  TEST_ASSERT_EQUAL_PTR("~", op->symbol); 
+}
+
+void test_tryConvertToPrefix_given_openBracket_should_convert_to_prefix_successfully(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "(";
+  
+  getToken_ExpectAndReturn((Token *)op);
+  op = (OperatorToken *)_getToken();
+
+  tryConvertToPrefix((Token **)&op);
+
+  TEST_ASSERT_EQUAL(PREFIX, op->arity);
+  TEST_ASSERT_EQUAL(LEFT_TO_RIGHT, op->assoc);
+  TEST_ASSERT_EQUAL(1, op->precedence);
+  TEST_ASSERT_EQUAL_PTR("(", op->symbol); 
 }
 
 void test_tryConvertToPrefix_given_plus_plus_plus_should_fail_to_convert_to_prefix(void)
@@ -254,4 +298,45 @@ void test_tryConvertToPrefix_given_plus_plus_plus_should_fail_to_convert_to_pref
   TEST_ASSERT_NOT_EQUAL(RIGHT_TO_LEFT, op->assoc);
   TEST_ASSERT_NOT_EQUAL(2, op->precedence);
   TEST_ASSERT_EQUAL_PTR("+++", op->symbol); 
+}
+
+void test_tryConvertToPrefix_given_greater_symbol_should_fail_to_convert_to_prefix(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = ">";
+  
+  getToken_ExpectAndReturn((Token *)op);
+  op = (OperatorToken *)_getToken();
+  
+  
+  // printf("op symbol = %s\n", op->symbol);
+  // printf("arity before = %d\n",op->arity);
+  // printf("precedence before = %d\n",op->precedence);
+  // printf("assoc before = %d\n",op->assoc);
+  
+  // printf("op symbol = %d\n", *op->symbol);
+
+  ErrorObject *err;
+  
+  Try
+  {
+    tryConvertToPrefix((Token **)&op);
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL_STRING("Hey! This symbol is not belong to prefix type.", \
+                               err->errorMsg);
+    TEST_ASSERT_EQUAL(FAIL_TO_CONVERT_TO_PREFIX, err->errorCode);
+    
+    freeError(err);
+  }
+  // printf("arity after = %d\n",op->arity);
+  // printf("precedence after = %d\n",op->precedence);
+  // printf("assoc after = %d\n",op->assoc);
+  
+  TEST_ASSERT_NOT_EQUAL(PREFIX, op->arity);
+  TEST_ASSERT_NOT_EQUAL(RIGHT_TO_LEFT, op->assoc);
+  TEST_ASSERT_NOT_EQUAL(2, op->precedence);
+  TEST_ASSERT_EQUAL_PTR(">", op->symbol); 
 }
