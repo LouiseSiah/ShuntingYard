@@ -2,6 +2,7 @@
 #include "ShuntingYard.h"
 #include "Stack.h"
 #include "mock_Token.h"
+#include "ErrorObject.h"
 #include <malloc.h>
 #include <stdio.h>
 
@@ -11,7 +12,7 @@ void tearDown(void){}
 
 void test_comparePlusOperators_given_plus_symbol_should_be_return_correct_attribute(void)
 {
-  OperatorToken *op = malloc(sizeof (OperatorToken));
+  OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "+";
 	comparePlusOperators(&op); 
@@ -22,23 +23,24 @@ void test_comparePlusOperators_given_plus_symbol_should_be_return_correct_attrib
   TEST_ASSERT_EQUAL(4, op->precedence); 
 }
 
+/*
 void test_comparePlusOperators_given_plus_plus_symbol_should_be_return_correct_attribute(void)
 {
-  OperatorToken *op = malloc(sizeof (OperatorToken));
+  OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "++";
 	comparePlusOperators(&op); 
 
 	TEST_ASSERT_NOT_NULL(op);
-  TEST_ASSERT_EQUAL(PREFIX, op->arity);
-  TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
-  TEST_ASSERT_EQUAL(2, op->precedence); 
-}
+  TEST_ASSERT_EQUAL(INFIX, op->arity);
+  TEST_ASSERT_EQUAL(LEFT_TO_RIGHT, op->assoc);
+  TEST_ASSERT_EQUAL(4, op->precedence); 
+}*/
 
 
 void test_compareMinusOperators_given_minus_symbol_should_be_return_correct_attribute(void)
 {
-  OperatorToken *op = malloc(sizeof (OperatorToken));
+  OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "-";
 	compareMinusOperators(&op); // ((OperatorToken**)&op)
@@ -59,7 +61,7 @@ void test_compareMinusOperators_given_minus_symbol_should_be_return_correct_attr
 
 void test_compareAsteriskOperators_given_Asterisk_symbol_should_be_return_correct_attribute(void)
 {
-  OperatorToken *op = malloc(sizeof (OperatorToken));
+  OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "*";
 	compareAsteriskOperators(&op); // ((OperatorToken**)&op)
@@ -80,7 +82,7 @@ void test_compareAsteriskOperators_given_Asterisk_symbol_should_be_return_correc
 
 void test_compareDivideOperators_given_Divide_symbol_should_be_return_correct_attribute(void)
 {
-  OperatorToken *op = malloc(sizeof (OperatorToken));
+  OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "/";
 	compareDivideOperators(&op); // ((OperatorToken**)&op)
@@ -153,4 +155,103 @@ void test__getToken(void)
   TEST_ASSERT_EQUAL(LEFT_TO_RIGHT, opDivide->assoc);
   TEST_ASSERT_EQUAL(3, opDivide->precedence);
   TEST_ASSERT_EQUAL_PTR("/", opDivide->symbol); 
+}
+
+void test_tryConvertToPrefix_given_plus_should_convert_to_prefix_successfully(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "+";
+  
+  getToken_ExpectAndReturn((Token *)op);
+  op = (OperatorToken *)_getToken();
+  
+  
+  // printf("op symbol = %s\n", op->symbol);
+  // printf("arity before = %d\n",op->arity);
+  // printf("precedence before = %d\n",op->precedence);
+  // printf("assoc before = %d\n",op->assoc);
+  
+  // printf("op symbol = %d\n", *op->symbol);
+
+  tryConvertToPrefix((Token **)&op);
+  
+  // printf("arity after = %d\n",op->arity);
+  // printf("precedence after = %d\n",op->precedence);
+  // printf("assoc after = %d\n",op->assoc);
+  
+  TEST_ASSERT_EQUAL(PREFIX, op->arity);
+  TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
+  TEST_ASSERT_EQUAL(2, op->precedence);
+  TEST_ASSERT_EQUAL_PTR("+", op->symbol); 
+}
+
+void test_tryConvertToPrefix_given_plus_plus_should_convert_to_prefix_successfully(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "++";
+  
+  getToken_ExpectAndReturn((Token *)op);
+  op = (OperatorToken *)_getToken();
+  
+  
+  // printf("op symbol = %s\n", op->symbol);
+  // printf("arity before = %d\n",op->arity);
+  // printf("precedence before = %d\n",op->precedence);
+  // printf("assoc before = %d\n",op->assoc);
+  
+  // printf("op symbol = %d\n", *op->symbol);
+
+  tryConvertToPrefix((Token **)&op);
+  
+  // printf("arity after = %d\n",op->arity);
+  // printf("precedence after = %d\n",op->precedence);
+  // printf("assoc after = %d\n",op->assoc);
+  
+  TEST_ASSERT_EQUAL(PREFIX, op->arity);
+  TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
+  TEST_ASSERT_EQUAL(2, op->precedence);
+  TEST_ASSERT_EQUAL_PTR("++", op->symbol); 
+}
+
+void test_tryConvertToPrefix_given_plus_plus_plus_should_fail_to_convert_to_prefix(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "+++";
+  
+  getToken_ExpectAndReturn((Token *)op);
+  op = (OperatorToken *)_getToken();
+  
+  
+  // printf("op symbol = %s\n", op->symbol);
+  // printf("arity before = %d\n",op->arity);
+  // printf("precedence before = %d\n",op->precedence);
+  // printf("assoc before = %d\n",op->assoc);
+  
+  // printf("op symbol = %d\n", *op->symbol);
+
+  ErrorObject *err;
+  
+  Try
+  {
+    tryConvertToPrefix((Token **)&op);
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL_STRING("Hey! This symbol is not belong to prefix type.", \
+                               err->errorMsg);
+    TEST_ASSERT_EQUAL(FAIL_TO_CONVERT_TO_PREFIX, err->errorCode);
+    
+    freeError(err);
+  }
+  // printf("arity after = %d\n",op->arity);
+  // printf("precedence after = %d\n",op->precedence);
+  // printf("assoc after = %d\n",op->assoc);
+  
+  TEST_ASSERT_NOT_EQUAL(PREFIX, op->arity);
+  TEST_ASSERT_NOT_EQUAL(RIGHT_TO_LEFT, op->assoc);
+  TEST_ASSERT_NOT_EQUAL(2, op->precedence);
+  TEST_ASSERT_EQUAL_PTR("+++", op->symbol); 
 }

@@ -2,6 +2,8 @@
 #include "Stack.h"
 #include "Token.h"
 #include <stdio.h>
+#include "ErrorObject.h"
+#include "CException.h"
 
 // typedef enum {
 	// PREFIX, //-2
@@ -26,17 +28,6 @@
 	// Token *token[0];
 // } OperatorToken;
 
-// void comparePlusOperators (Token **token) // + is pre = 4, left-to-right, arity = infix
-// {
-  // //printf("symbol'+' = %d\n", '+');
-  // //printf(" *symbol'+' = %d\n",(int) *((OperatorToken *)token)->symbol);
-  // if((int) *((OperatorToken *)token)->symbol == '+') //must be '+' cannot "+"
-  // { 
-    // ((OperatorToken *)token)->arity = INFIX;
-    // ((OperatorToken *)token)->precedence = 4;
-    // ((OperatorToken *)token)->assoc = LEFT_TO_RIGHT;
-  // }
-// }
 
 void comparePlusOperators(OperatorToken **token) // + is pre = 4, left-to-right, arity = infix
 {
@@ -46,19 +37,19 @@ void comparePlusOperators(OperatorToken **token) // + is pre = 4, left-to-right,
   //printf("symboltoken = %s (**token)\n", ((*token)->symbol+1));
   
   //if((int) *(*token)->symbol == '+') //must be '+' cannot "+"
-  if((int) *(*token)->symbol == '+' && (int) *((*token)->symbol+1) == 0) 
+  if((int) *(*token)->symbol == '+' && (int) *((*token)->symbol + 1) == 0) 
   { 
     //printf("+\n");
     (*token)->arity = INFIX;
     (*token)->precedence = 4;
     (*token)->assoc = LEFT_TO_RIGHT;
   }
-  else if((int) *(*token)->symbol == '+' && (int) *((*token)->symbol+1) == '+') 
+  else if((int) *(*token)->symbol == '+' && (int) *((*token)->symbol + 1) == '+') 
   {
     //printf("++\n");
-    (*token)->arity = PREFIX;
-    (*token)->precedence = 2;
-    (*token)->assoc = RIGHT_TO_LEFT;
+    (*token)->arity = INFIX;
+    (*token)->precedence = 4;
+    (*token)->assoc = LEFT_TO_RIGHT;
   }
 }
 
@@ -119,3 +110,73 @@ Token *_getToken()  //assign attributes
     return token;
   
 }
+
+void tryConvertToPrefix(Token **token)
+{
+  // printf(" token symbol add= %d\n", (int) *((OperatorToken *) *token)->symbol);
+  // printf("OperatorToken token symbol = %s\n", ((OperatorToken *) *token)->symbol);
+  // printf("'+'%d\n", '+');
+  if ( (int) *((OperatorToken *) *token)->symbol == '+' \
+       && (int) *(((OperatorToken *) *token)->symbol + 1) == 0)
+  {
+    ((OperatorToken *) *token)->arity = PREFIX;
+    ((OperatorToken *) *token)->precedence = 2;
+    ((OperatorToken *) *token)->assoc = RIGHT_TO_LEFT;
+  }
+    
+  else if ( (int) *((OperatorToken *) *token)->symbol == '+' \
+           && (int) *(((OperatorToken *) *token)->symbol + 1) == '+' \
+           && (int) *(((OperatorToken *) *token)->symbol + 2) == 0)
+  {
+    ((OperatorToken *) *token)->arity = PREFIX;
+    ((OperatorToken *) *token)->precedence = 2;
+    ((OperatorToken *) *token)->assoc = RIGHT_TO_LEFT;
+  }
+  
+  else if( (int) *((OperatorToken *) *token)->symbol == '-' \
+          && (int) *(((OperatorToken *) *token)->symbol + 1) == 0)
+  {
+    ((OperatorToken *) *token)->arity = PREFIX;
+    ((OperatorToken *) *token)->precedence = 2;
+    ((OperatorToken *) *token)->assoc = RIGHT_TO_LEFT;
+  }
+  
+  else if ( (int) *((OperatorToken *) *token)->symbol == '-' \
+           && (int) *(((OperatorToken *) *token)->symbol + 1) == '-' \
+           && (int) *(((OperatorToken *) *token)->symbol + 2) == 0)
+  {
+    ((OperatorToken *) *token)->arity = PREFIX;
+    ((OperatorToken *) *token)->precedence = 2;
+    ((OperatorToken *) *token)->assoc = RIGHT_TO_LEFT;
+  }
+  
+  else if( (int) *((OperatorToken *) *token)->symbol == '!' \
+          && (int) *(((OperatorToken *) *token)->symbol + 1) == 0)
+  {
+    ((OperatorToken *) *token)->arity = PREFIX;
+    ((OperatorToken *) *token)->precedence = 2;
+    ((OperatorToken *) *token)->assoc = RIGHT_TO_LEFT;
+  }
+  
+  else if( (int) *((OperatorToken *) *token)->symbol == '~' \
+          && (int) *(((OperatorToken *) *token)->symbol + 1) == 0)
+  {
+    ((OperatorToken *) *token)->arity = PREFIX;
+    ((OperatorToken *) *token)->precedence = 2;
+    ((OperatorToken *) *token)->assoc = RIGHT_TO_LEFT;
+  }
+  
+  else if( (int) *((OperatorToken *) *token)->symbol == '(' \
+          && (int) *(((OperatorToken *) *token)->symbol + 1) == 0)
+  {
+    ((OperatorToken *) *token)->arity = PREFIX;
+    ((OperatorToken *) *token)->precedence = 2;
+    ((OperatorToken *) *token)->assoc = RIGHT_TO_LEFT;
+  }
+  
+  else
+    throwError("Hey! This symbol is not belong to prefix type.",  \
+                FAIL_TO_CONVERT_TO_PREFIX);
+ 
+}
+       
