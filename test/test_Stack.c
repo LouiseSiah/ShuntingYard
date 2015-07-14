@@ -27,28 +27,27 @@ void test_stackCreate_should_return_Non_NULL_Stack_with_all_fields_cleared()
   TEST_ASSERT_EQUAL(0, stack->length);
 }
 
-/*  add 1 should create a element as below:
- *        -----------
- *        |    1    |----
- *        -----------   |
- *                      |
- *                     \/
- *                   -------
- *                    -----
- *                     --
- */
-void test_elementCreate_given_1_into_element_should_return_1()
-{
-  int value1 = 1;
-  Element *element = malloc(sizeof(Element));
-  element = elementCreate(&value1);
 
-  // printf("%x add of value 1 \n", &value1);
-  // printf("%x add of element->data \n", element->data);
-  // printf("%x value of element->data \n", *((int *)(element->data)));
-  
+/*  add an integer token should create a element as below:
+ *    
+ *    IntegerToken
+ *    -------------------
+ *    TOKEN_INTEGER_TYPE|
+ *    1                 |--->NULL
+ *    ------------------
+ *
+ *
+ */
+void test_elementCreate_given_IntegerToken_with_a_value_1_into_element_should_return_the_token()
+{
+  IntegerToken *value1 = malloc(sizeof(IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1; 
+  Element *element = elementCreate(value1);
+    
   TEST_ASSERT_NOT_NULL(element);
-  TEST_ASSERT_EQUAL(1, *((int *)(element->data)));
+  TEST_ASSERT_EQUAL(1, ((IntegerToken *)element->data)->value);
+  TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, ((IntegerToken *)element->data)->type);
   TEST_ASSERT_NULL(element->next);
 }
 
@@ -74,7 +73,7 @@ void test_elementCreate_given_1_into_element_should_return_1()
  *        ----                  -----
  *         --                     --
  */
-void test_stackAdd_insert_given_empty_stack_then_add_empty_should_ignore_the_element()
+void test_stackPush_insert_given_empty_stack_then_add_empty_should_ignore_the_element()
 {
   int value0 = 0;
   List *stack = stackCreate();
@@ -88,91 +87,145 @@ void test_stackAdd_insert_given_empty_stack_then_add_empty_should_ignore_the_ele
 
 /* ADD   
  *
- *        -----------                                     ---------------
- *        |    1    |----          |                 -----|  HEAD| TAIL |----
- *        -----------   |          |                 |   ---------------    |
- *                      |     ---- + ----            |                      |
- *                     \/          |                \/                     \/
- *                   -------       |              ------                 -------
- *                    -----                       ----                   -----
- *                     --                          --                     --
- *
+ *    IntegerToken                                              ---------------
+*    -------------------                 |                -----|  HEAD| TAIL |----
+ *    TOKEN_INTEGER_TYPE|                |                 |   ---------------    |
+ *    1                 |--->NULL   ---- + ----           |                      |
+ *    ------------------                 |               \/                     \/
+ *                                       |             ------                 -------
+ *                                                      ----                   -----
+ *                                                       --                     --
  *RESULT
- *
  *                ---------------
  *          -----|  HEAD| TAIL |----
  *          |    ---------------   |
  *          |                      |
  *         \/                      |
- *        -----------              |
- *        |    1    |<-------------
- *        -----------  
-*          |
- *         |
- *        \/
- *       -------
- *        -----
- *         --
+ *    IntegerToken        <--------
+ *    -------------------
+ *    TOKEN_INTEGER_TYPE|
+ *    1                 |--->NULL
+ *    ------------------
+ *
  */
-void test_stackAdd_given_empty_stack_then_add_1_should_add_element_1_into_the_stack()
+void test_stackPush_given_empty_stack_then_add_an_IntegerToken_should_add_IntegerToken_into_the_stack()
 {
-  int value1 = 1;
+  IntegerToken *value1 = malloc(sizeof(IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1; 
+  
   List *stack = stackCreate();
 
-  stackPush(stack, &value1);
+  stackPush(stack, value1);
 
   TEST_ASSERT_NOT_NULL(stack);
-  TEST_ASSERT_EQUAL(value1, *((int *)(stack->head->data)));
-  TEST_ASSERT_EQUAL(value1, *((int *)(stack->tail->data)));
+  TEST_ASSERT_EQUAL(1, value1->value);
+  TEST_ASSERT_EQUAL(1, ((IntegerToken *)stack->head->data)->value);
+  TEST_ASSERT_EQUAL(1, ((IntegerToken *)stack->tail->data)->value);
+  TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, ((IntegerToken *)stack->head->data)->type);
   TEST_ASSERT_EQUAL(1, stack->length);
   TEST_ASSERT_NULL(stack->tail->next);
 }
 
 /* ADD   
- *
- *        -----------                                     ---------------
- *        |    2    |----          |                 -----|  HEAD| TAIL |----
- *        -----------   |          |                 |   ---------------    |
- *                      |     ---- + ----            |      -----           |
- *                     \/          |                 ----->|  1 |<----------
- *                   -------       |                       ------
- *                    -----                                   |
- *                     --                                    \/
- *                                                         ------
- *                                                          ----
- *                                                           --
+ *        IntegerToken                                    ---------------
+ *        |    2    |---->NULL                        ----|  HEAD| TAIL |----
+ *        -----------              |                 |   ---------------    |
+ *                                 |                 |      IntegerToken    |
+ *                            ---- + ----            |      -----           |
+ *                                 |                 ----->|  1 |<----------
+ *                                 |                       ------
+ *                                                            |
+ *                                                           \/
+ *                                                         NULL
  * RESULT
  *                      ---------------
  *                -----|  HEAD| TAIL  |---
  *               |     ---------------   |
  *              \/                      \/
+ *            IntegerToken            IntegerToken
  *            -------                 ------
- *           |   1  |--------------> |  2  | --------------
- *           -------                 -------              |
- *                                                        |
- *                                                       \/
- *                                                     ------
- *                                                      ----
- *                                                       --
- *
+ *           |   2  |--------------> |  1  | -------->NULL
+ *           -------                 -------              
  *
  */
-void test_stackAdd_given_empty_stack_then_create_2_element_should_add_the_2_elements_into_the_stack()
+void test_stackPush_given_a_stack_holding_one_element_then_push_a_new_element_should_add_the_second_element_into_the_stack()
 {
-  int value1 = 1,
-      value2 = 2;
-
+  IntegerToken *value1 = malloc(sizeof(IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1; 
   List *stack = stackCreate();
-  stackPush(stack, &value1);
-  stackPush(stack, &value2);
+  stackPush(stack, value1);
 
+  IntegerToken *value2 = malloc(sizeof(IntegerToken));
+  value2->type = TOKEN_INTEGER_TYPE;
+  value2->value = 2; 
+  stackPush(stack, value2);
+  
   TEST_ASSERT_NOT_NULL(stack);
-  TEST_ASSERT_EQUAL(value2, *((int *)(stack->head->data)));
-  TEST_ASSERT_EQUAL(value1, *((int *)(stack->tail->data)));
+  TEST_ASSERT_EQUAL(2, ((IntegerToken *)stack->head->data)->value);
+  TEST_ASSERT_EQUAL(1, ((IntegerToken *)stack->tail->data)->value);
+  TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, ((IntegerToken *)stack->head->data)->type);
+  TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, ((IntegerToken *)stack->tail->data)->type);
   TEST_ASSERT_EQUAL(2, stack->length);
   TEST_ASSERT_NULL(stack->tail->next);
 }
 
+/* ADD   
+ *        IntegerToken                                    ---------------
+ *        |    2    |---->NULL                        ----|  HEAD| TAIL |----
+ *        -----------              |                 |   ---------------    |
+ *                                 |                 |      IntegerToken    |
+ *                            ---- + ----            |      -----           |
+ *                                 |                 ----->|  1 |<----------
+ *                                 |                       ------
+ *                                                            |
+ *                                                           \/
+ *                                                         NULL
+ * RESULT
+ *                      ---------------
+ *                -----|  HEAD| TAIL  |---------
+ *               |     ---------------         |
+ *              \/                            \/
+ *            IntegerToken IntegerToken   IntegerToken
+ *            -------      -------        ------
+ *           |   3  |---->|   2  | ----> |  1  | -------->NULL
+ *           -------      -------        -------              
+ *
+ */
+void test_stackPush_given_a_stack_holding_two_element_then_push_a_new_element_should_add_the_third_element_into_the_stack()
+{
+  IntegerToken *value1 = malloc(sizeof(IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1; 
+  List *stack = stackCreate();
+  stackPush(stack, value1);
+
+  IntegerToken *value2 = malloc(sizeof(IntegerToken));
+  value2->type = TOKEN_INTEGER_TYPE;
+  value2->value = 2; 
+  stackPush(stack, value2);
+  
+  
+  IntegerToken *value3 = malloc(sizeof(IntegerToken));
+  value3->type = TOKEN_INTEGER_TYPE;
+  value3->value = 3; 
+  stackPush(stack, value3);
+  
+  // printf("%d add contained of IntegerToken value1 \n", value1);
+  // printf("%d add of element->data \n", element->data);
+  // printf("%x value of element->data \n", ((IntegerToken *)stack->tail->data)->value);
+  // printf("%x value of element->data \n", ((IntegerToken *)stack->head->data)->value);
+  
+  TEST_ASSERT_NOT_NULL(stack);
+ // TEST_ASSERT_EQUAL(1, value1->value);
+  TEST_ASSERT_EQUAL(3, ((IntegerToken *)stack->head->data)->value);
+  TEST_ASSERT_EQUAL(1, ((IntegerToken *)stack->tail->data)->value);
+  TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, ((IntegerToken *)stack->head->data)->type);
+  TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, ((IntegerToken *)stack->tail->data)->type);
+  TEST_ASSERT_EQUAL(3, stack->length);
+  TEST_ASSERT_NULL(stack->tail->next);
+}
 
 /**************BEFORE and AFTER************
  *                ---------------
@@ -180,10 +233,7 @@ void test_stackAdd_given_empty_stack_then_create_2_element_should_add_the_2_elem
  *          |   ---------------    |
  *          |                      |
  *         \/                     \/
- *       ------                 -------
- *        ----                  -----
- *         --                     --
- *
+ *        NULL                  NULL
  *
  *
  */
@@ -203,67 +253,63 @@ void test_stackRemove_given_empty_stack_then_do_nothing_should_return_NULL()
 
 /*
  ***********************BEFORE**********************************
- *               ---------------
+ *                ---------------
  *          -----|  HEAD| TAIL |----
  *          |    ---------------   |
  *          |                      |
  *         \/                      |
- *        -----------              |
- *        |    1    |<-------------
- *        -----------  
- *         |
- *         |
- *        \/
- *       -------
- *        -----
- *         --
+ *    IntegerToken        <--------
+ *    -------------------
+ *    TOKEN_INTEGER_TYPE|
+ *    1                 |--->NULL
+ *    ------------------
+ 
  ************************AFTER************************************************
  *                ---------------
  *          -----|  HEAD| TAIL  |----
  *          |    ---------------    |
  *          |                       |
  *         \/                      \/
- *       ------                  -------
- *        ----                    ----
- *         --                      --
+ *        NULL                  NULL
  *
- *
- *  -----------    -----------
- * |elemRemove|--->|    1    |----
- * ------------    -----------   |
- *                               |
- *                              \/
- *                           -------
- *                            ----
- *                             --
+ *  -----------
+ * |elemRemove|---> IntegerToken   
+ * ------------    ---------------------
+ *                  TOKEN_INTEGER_TYPE |
+ *                        1           |--->NULL
+ *                 --------------------        
+ *    
+ *    
  *
  */
 void test_stackRemove_given_one_element_stack_then_remove_the_only_element_should_return_NULL()
 {
-  IntegerToken *int1 = malloc(sizeof (IntegerToken));
-  IntegerToken *intRemove = malloc(sizeof (IntegerToken));
-  int1->type = TOKEN_INTEGER_TYPE;
-  int1->value = 1;
+  IntegerToken *value1 = malloc(sizeof (IntegerToken));
+  IntegerToken *valueRemove = malloc(sizeof (IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1;
   
   List *stack = stackCreate();
   
-  stackPush(stack, int1);
-  intRemove = (IntegerToken *)stackPop(stack);
+  stackPush(stack, value1);
+  valueRemove = (IntegerToken *)stackPop(stack);
 
   TEST_ASSERT_NOT_NULL(stack);
   TEST_ASSERT_NULL(stack->head);
   TEST_ASSERT_NULL(stack->tail);
   TEST_ASSERT_EQUAL(0, stack->length);
-  TEST_ASSERT_EQUAL(1, intRemove->value);
+  TEST_ASSERT_EQUAL(1, valueRemove->value);
+  TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, valueRemove->type);
 }
 
+//No yet
 /***********************BEFORE*****************************************
  *                      ---------------
  *                -----|  HEAD| TAIL  |---
  *               |     ---------------   |
  *              \/                      \/
  *            -------                 ------
- *           |   1  |--------------> |  2  | --------------
+ *           |   2  |--------------> |  1  | --------------
  *           -------                 -------              |
  *                                                        |
  *                                                       \/

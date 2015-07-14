@@ -44,14 +44,6 @@ void test_compareMinusOperators_given_minus_symbol_should_be_return_correct_attr
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "-";
 	compareMinusOperators(&op); // ((OperatorToken**)&op)
-  // printf("op symbol = %d\n", *op->symbol);
-  // printf("op symbol = %s\n", op->symbol);
-  // printf("arity before = %d\n",op->arity);
-  // printf("&op = %d\n", &op);
-  
-  // printf("arity after = %d\n",op->arity);
-  // printf("precedence after = %d\n",op->precedence);
-  // printf("assoc after = %d\n",op->assoc);
 
 	TEST_ASSERT_NOT_NULL(op);
   TEST_ASSERT_EQUAL(INFIX, op->arity);
@@ -65,14 +57,6 @@ void test_compareAsteriskOperators_given_Asterisk_symbol_should_be_return_correc
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "*";
 	compareAsteriskOperators(&op); // ((OperatorToken**)&op)
-  // printf("op symbol = %d\n", *op->symbol);
-  // printf("op symbol = %s\n", op->symbol);
-  // printf("arity before = %d\n",op->arity);
-  // printf("&op = %d\n", &op);
-  
-  // printf("arity after = %d\n",op->arity);
-  // printf("precedence after = %d\n",op->precedence);
-  // printf("assoc after = %d\n",op->assoc);
 
 	TEST_ASSERT_NOT_NULL(op);
   TEST_ASSERT_EQUAL(INFIX, op->arity);

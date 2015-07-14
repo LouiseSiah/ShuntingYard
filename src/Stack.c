@@ -19,8 +19,8 @@ List *stackCreate()
 Element *elementCreate(void *data)
 {
   Element *elem = malloc(sizeof(Element));
-  assert(elem !=NULL);
-  
+  assert(elem != NULL);
+ 
   elem->next = NULL;
   elem->data = data;
   
