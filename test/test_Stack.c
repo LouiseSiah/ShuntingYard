@@ -21,7 +21,7 @@ void test_stackCreate_should_return_Non_NULL_Stack_with_all_fields_cleared()
 {
   List *stack = malloc (sizeof(List));
   stack = stackCreate();
-	TEST_ASSERT_NOT_NULL(stack);
+  TEST_ASSERT_NOT_NULL(stack);
   TEST_ASSERT_NULL(stack->head);
   TEST_ASSERT_NULL(stack->tail);
   TEST_ASSERT_EQUAL(0, stack->length);
@@ -173,15 +173,14 @@ void test_stackPush_given_a_stack_holding_one_element_then_push_a_new_element_sh
 
 /* ADD   
  *        IntegerToken                                    ---------------
- *        |    2    |---->NULL                        ----|  HEAD| TAIL |----
+ *        |    3    |---->NULL                        ----|  HEAD| TAIL |----
  *        -----------              |                 |   ---------------    |
- *                                 |                 |      IntegerToken    |
- *                            ---- + ----            |      -----           |
- *                                 |                 ----->|  1 |<----------
- *                                 |                       ------
- *                                                            |
- *                                                           \/
- *                                                         NULL
+ *                                 |                \/                     \/
+ *                            ---- + ----         IntegerToken     IntegerToken
+ *                                 |              ------           ------
+ *                                 |             |  2  |------->  |  1  |------->NULL
+ *                                                -----           ------                                                   
+ * 
  * RESULT
  *                      ---------------
  *                -----|  HEAD| TAIL  |---------
@@ -205,7 +204,6 @@ void test_stackPush_given_a_stack_holding_two_element_then_push_a_new_element_sh
   value2->type = TOKEN_INTEGER_TYPE;
   value2->value = 2; 
   stackPush(stack, value2);
-  
   
   IntegerToken *value3 = malloc(sizeof(IntegerToken));
   value3->type = TOKEN_INTEGER_TYPE;
@@ -237,7 +235,7 @@ void test_stackPush_given_a_stack_holding_two_element_then_push_a_new_element_sh
  *
  *
  */
-void test_stackRemove_given_empty_stack_then_do_nothing_should_return_NULL()
+void test_stackPop_given_empty_stack_then_do_nothing_should_return_NULL()
 {
   List *stack = stackCreate();
   OperatorToken *op = malloc(sizeof (OperatorToken) + sizeof(Token *) * 2);
@@ -282,7 +280,7 @@ void test_stackRemove_given_empty_stack_then_do_nothing_should_return_NULL()
  *    
  *
  */
-void test_stackRemove_given_one_element_stack_then_remove_the_only_element_should_return_NULL()
+void test_stackPop_given_one_element_stack_then_remove_the_only_element_should_return_NULL()
 {
   IntegerToken *value1 = malloc(sizeof (IntegerToken));
   IntegerToken *valueRemove = malloc(sizeof (IntegerToken));
@@ -302,205 +300,3 @@ void test_stackRemove_given_one_element_stack_then_remove_the_only_element_shoul
   TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, valueRemove->type);
 }
 
-//No yet
-/***********************BEFORE*****************************************
- *                      ---------------
- *                -----|  HEAD| TAIL  |---
- *               |     ---------------   |
- *              \/                      \/
- *            -------                 ------
- *           |   2  |--------------> |  1  | --------------
- *           -------                 -------              |
- *                                                        |
- *                                                       \/
- *                                                     ------
- *                                                      ----
- *                                                       --
- ********************AFTER************************************************
- *
- *
- *
- *                ---------------
- *          -----|  HEAD| TAIL |----
- *          |    ---------------   |
- *          |                      |
- *         \/                      |
- *        -----------              |
- *        |    1    |<-------------
- *        -----------  
- *         |
- *         |
- *        \/
- *       -------
- *        -----
- *         --
- *
- *
- *  -----------    -----------
- * |elemRemove|--->|    2    |----
- * ------------    -----------   |
- *                               |
- *                              \/
- *                           -------
- *                            ----
- *                             --
- *
- *
- */
-/*void test_stackRemove_given_two_elements_stack_then_remove_the_top_element_should_return_first_element()
-{
-  int topValue = 2,
-      firstValue = 1;
-  
-  List *stack = stackCreate();
-  Element *element = malloc(sizeof(Element));
-  element = elementCreate(&firstValue);
-  stackPush(stack, element);
-  element = elementCreate(&topValue);
-  stackPush(stack, element);
-  Element *elemRemove = stackPop(stack);
-
-  TEST_ASSERT_NOT_NULL(element);
-  TEST_ASSERT_NOT_NULL(stack);
-  TEST_ASSERT_EQUAL(firstValue, *((int *)(stack->head->data)));
-  TEST_ASSERT_EQUAL(firstValue, *((int *)(stack->tail->data)));
-  TEST_ASSERT_EQUAL(topValue, *((int *)(elemRemove->data)));
-  TEST_ASSERT_EQUAL(1, stack->length);
-  TEST_ASSERT_NULL(stack->tail->next);
-}
-
-// /************************BEFORE*****************************************
- // *                      ---------------
- // *                -----|  HEAD| TAIL  |----
- // *               |     ---------------    |
- // *              \/                       \/                              
- // *            -------     ------    ------- 
- // *           |   1  |--->|  2  |--->|  3  |
- // *           -------     ------     ------- 
- // *                                   |
- // *                                  \/
- // *                                 ------
- // *                                  ---
- // *                                  --
- // *
- // ************************AFTER****************************************
- // *                      ---------------
- // *                -----|  HEAD| TAIL  |---
- // *               |     ---------------   |
- // *              \/                      \/
- // *            -------                 ------
- // *           |   1  |--------------> |  2  | --------------
- // *           -------                 -------              |
- // *                                                        |
- // *                                                       \/
- // *                                                     ------
- // *                                                      ----
- // *                                                       --
- // *  -----------    -----------
- // * |elemRemove|--->|    3    |----
- // * ------------    -----------   |
- // *                               |
- // *                              \/
- // *                           -------
- // *                            ----
- // *                             --
- // */
-// void test_stackRemove_given_three_elements_stack_then_remove_the_top_element_should_return_remain_stack()
-// {
-  // Element *elemRemove = malloc(sizeof(Element));
-  // List *stack = malloc (sizeof(List));
-  // stack = stackCreate();
-  // Element *element1 = elementCreate(1),
-               // *element2 = elementCreate(2),
-               // *element3 = elementCreate(3);
-
-  // stackPush(stack, element1);
-  // stackPush(stack, element2);
-  // stackPush(stack, element3);
-
-  // elemRemove = stackPop(stack);
-
-  // TEST_ASSERT_NOT_NULL(elemRemove);
-  // TEST_ASSERT_NOT_NULL(stack);
-  // TEST_ASSERT_EQUAL(element3->data, elemRemove->data);
-  // TEST_ASSERT_EQUAL(element2->data, stack->head->data);
-  // TEST_ASSERT_EQUAL(element1->data, stack->tail->data);
-  // TEST_ASSERT_EQUAL(2, stack->length);
-  // TEST_ASSERT_NULL(stack->tail->next);
-// }
-
-
-// /************************BEFORE*****************************************
- // *                      ---------------
- // *                -----|  HEAD| TAIL  |----
- // *               |     ---------------    |
- // *              \/                       \/                              
- // *            -------     ------    ------- 
- // *           |   1  |--->|  2  |--->|  3  |
- // *           -------     ------     ------- 
- // *                                   |
- // *                                  \/
- // *                                 ------
- // *                                  ---
- // *                                  --
- // *
- // ************************AFTER****************************************
- // *                      ---------------
- // *                -----|  HEAD| TAIL  |---
- // *               |     ---------------   |
- // *              \/                       |
- // *            -------                    |
- // *           |   1  |<-------------------
- // *           -------               
- // *              |
- // *             \/
- // *            ------
- // *             ----
- // *              --
- // *
- // *  -----------     -----------
- // * |elemRemove1|--->|    3    |----
- // * ------------     -----------  |
- // *                               |
- // *                              \/
- // *                           -------
- // *                            ----
- // *                             --
- // *
- // *  -----------     -----------
- // * |elemRemove2|--->|    2    |----
- // * ------------     -----------  |
- // *                               |
- // *                              \/
- // *                           -------
- // *                            ----
- // *                             --
- // */
-// void test_stackRemove_given_three_elements_stack_then_remove_twice_the_top_element_should_return_the_only_element()
-// {
-  // int value1 = 1,
-      // value2 = 2,
-      // value3 = 3;
-  // List *stack = malloc (sizeof(List));
-  // stack = stackCreate();
-  // Element *element = malloc(sizeof(Element));
-  // element = elementCreate(value1);
-  // stackPush(stack, element);
-  // element = elementCreate(value2);
-  // stackPush(stack, element);
-  // element = elementCreate(value3);
-  // stackPush(stack, element);
-
-  // Element *elemRemove1 = stackPop(stack);
-  // Element *elemRemove2 = stackPop(stack);
-  
-  // TEST_ASSERT_NOT_NULL(elemRemove1);
-  // TEST_ASSERT_NOT_NULL(elemRemove2);
-  // TEST_ASSERT_NOT_NULL(stack);
-  // TEST_ASSERT_EQUAL(value3, elemRemove1->data);
-  // TEST_ASSERT_EQUAL(value2, elemRemove2->data);
-  // TEST_ASSERT_EQUAL(value1, stack->head->data);
-  // TEST_ASSERT_EQUAL(value1, stack->tail->data);
-  // TEST_ASSERT_EQUAL(1, stack->length);
-  // TEST_ASSERT_NULL(stack->tail->next);
-// }
