@@ -15,7 +15,7 @@ Token *reduction(List *intStack, List *opStack)
 
   if(op->arity == INFIX)
   {
-    printf("INFIX TREE\n");
+    // printf("INFIX TREE\n");
     OperatorToken *rightTK= malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
     OperatorToken *leftTK = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
   
@@ -28,7 +28,7 @@ Token *reduction(List *intStack, List *opStack)
   
   else
   {
-    printf("PREFIX TREE\n");
+    //printf("PREFIX TREE\n");
     OperatorToken *leftTK = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
   
     leftTK = (OperatorToken *)stackPop(intStack);
