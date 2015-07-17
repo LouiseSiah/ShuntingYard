@@ -4,6 +4,9 @@
 typedef enum
 {
   FAIL_TO_CONVERT_TO_PREFIX,
+  NOT_NUMBER_AFTER_OPERATOR,
+  NEITHER_OPERATOR_NOR_NUMBER,
+  UNKNOWN_ERROR,
 } ErrorCode;
 
 typedef struct

@@ -6,13 +6,9 @@
 #include <malloc.h>
 #include <stdio.h>
 
-void setUp(void)
-{
-}
+void setUp(void){}
 
-void tearDown(void)
-{
-}
+void tearDown(void){}
 
 void test_comparePlusOperators_given_plus_symbol_should_be_return_correct_attribute(void)
 {
@@ -145,16 +141,20 @@ void test__getToken(void)
   TEST_ASSERT_EQUAL_PTR("/", opDivide->symbol);
 }
 
+
 void test_tryConvertToPrefix_given_plus_should_convert_to_prefix_successfully(void)
 {
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "+";
-
+  
+  OperatorToken **opP = malloc(sizeof(OperatorToken));
+  opP = &op;
+  
   getToken_ExpectAndReturn((Token *)op);
   op = (OperatorToken *)_getToken();
 
-  tryConvertToPrefix((Token **)&op);
+  tryConvertToPrefix((Token ***)&opP);
 
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
@@ -170,8 +170,10 @@ void test_tryConvertToPrefix_given_plus_plus_should_convert_to_prefix_successful
 
   getToken_ExpectAndReturn((Token *)op);
   op = (OperatorToken *)_getToken();
-
-  tryConvertToPrefix((Token **)&op);
+  
+  OperatorToken **opP = malloc(sizeof(OperatorToken));
+  opP = &op;
+  tryConvertToPrefix((Token ***)&opP);
 
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
@@ -188,7 +190,9 @@ void test_tryConvertToPrefix_given_minus_should_convert_to_prefix_successfully(v
   getToken_ExpectAndReturn((Token *)op);
   op = (OperatorToken *)_getToken();
 
-  tryConvertToPrefix((Token **)&op);
+  OperatorToken **opP = malloc(sizeof(OperatorToken));
+  opP = &op;
+  tryConvertToPrefix((Token ***)&opP);
 
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
@@ -205,7 +209,9 @@ void test_tryConvertToPrefix_given_logicalNOT_should_convert_to_prefix_successfu
   getToken_ExpectAndReturn((Token *)op);
   op = (OperatorToken *)_getToken();
 
-  tryConvertToPrefix((Token **)&op);
+  OperatorToken **opP = malloc(sizeof(OperatorToken));
+  opP = &op;
+  tryConvertToPrefix((Token ***)&opP);
 
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
@@ -222,7 +228,9 @@ void test_tryConvertToPrefix_given_bitwiseNOT_should_convert_to_prefix_successfu
   getToken_ExpectAndReturn((Token *)op);
   op = (OperatorToken *)_getToken();
 
-  tryConvertToPrefix((Token **)&op);
+  OperatorToken **opP = malloc(sizeof(OperatorToken));
+  opP = &op;
+  tryConvertToPrefix((Token ***)&opP);
 
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
@@ -239,7 +247,9 @@ void test_tryConvertToPrefix_given_openBracket_should_convert_to_prefix_successf
   getToken_ExpectAndReturn((Token *)op);
   op = (OperatorToken *)_getToken();
 
-  tryConvertToPrefix((Token **)&op);
+  OperatorToken **opP = malloc(sizeof(OperatorToken));
+  opP = &op;
+  tryConvertToPrefix((Token ***)&opP);
 
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(LEFT_TO_RIGHT, op->assoc);
@@ -255,20 +265,15 @@ void test_tryConvertToPrefix_given_plus_plus_plus_should_fail_to_convert_to_pref
 
   getToken_ExpectAndReturn((Token *)op);
   op = (OperatorToken *)_getToken();
-
-
-  // printf("op symbol = %s\n", op->symbol);
-  // printf("arity before = %d\n",op->arity);
-  // printf("precedence before = %d\n",op->precedence);
-  // printf("assoc before = %d\n",op->assoc);
-
-  // printf("op symbol = %d\n", *op->symbol);
+  
+  OperatorToken **opP = malloc(sizeof(OperatorToken));
+  opP = &op;
 
   ErrorObject *err;
 
   Try
   {
-    tryConvertToPrefix((Token **)&op);
+    tryConvertToPrefix((Token ***)&opP);
   }
   Catch(err)
   {
@@ -278,9 +283,6 @@ void test_tryConvertToPrefix_given_plus_plus_plus_should_fail_to_convert_to_pref
 
     freeError(err);
   }
-  // printf("arity after = %d\n",op->arity);
-  // printf("precedence after = %d\n",op->precedence);
-  // printf("assoc after = %d\n",op->assoc);
 
   TEST_ASSERT_NOT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_NOT_EQUAL(RIGHT_TO_LEFT, op->assoc);
@@ -293,13 +295,16 @@ void test_tryConvertToPrefix_given_greater_symbol_should_fail_to_convert_to_pref
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = ">";
+  op->arity = 123;
 
   getToken_ExpectAndReturn((Token *)op);
   op = (OperatorToken *)_getToken();
 
+  OperatorToken **opP = malloc(sizeof(OperatorToken));
+  opP = &op;
 
   // printf("op symbol = %s\n", op->symbol);
-  // printf("arity before = %d\n",op->arity);
+  //printf("arity before = %d\n",op->arity);
   // printf("precedence before = %d\n",op->precedence);
   // printf("assoc before = %d\n",op->assoc);
 
@@ -309,7 +314,7 @@ void test_tryConvertToPrefix_given_greater_symbol_should_fail_to_convert_to_pref
 
   Try
   {
-    tryConvertToPrefix((Token **)&op);
+    tryConvertToPrefix((Token ***)&opP);
   }
   Catch(err)
   {
