@@ -124,6 +124,7 @@ void test_stackPush_given_empty_stack_then_add_an_IntegerToken_should_add_Intege
   TEST_ASSERT_EQUAL(1, ((IntegerToken *)stack->tail->data)->value);
   TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, ((IntegerToken *)stack->head->data)->type);
   TEST_ASSERT_EQUAL(1, stack->length);
+  TEST_ASSERT_NULL(stack->head->next);
   TEST_ASSERT_NULL(stack->tail->next);
 }
 

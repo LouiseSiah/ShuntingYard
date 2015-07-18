@@ -5,7 +5,7 @@
 #include "ErrorObject.h"
 #include "CException.h"
 
-Token *reduction(List *intStack, List *opStack)
+void reduction(List *intStack, List *opStack)
 {
   OperatorToken *op = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
   op = (OperatorToken *)stackPop(opStack);
@@ -33,7 +33,8 @@ Token *reduction(List *intStack, List *opStack)
     op->token[0] = (Token *) leftTK;
   }
 
-  return (Token *)op;
+  stackPush(intStack, op);
+  //return (Token *)op;
 }
 
 void secondPosition(Token *token, int *whichPosition)
@@ -87,6 +88,36 @@ void firstPosition(Token **token, int *whichPosition)
     }
 
   }
+}
+
+void fourthPosition(Token *token, int *whichPosition)
+{
+  if(((OperatorToken *)token)->type == TOKEN_OPERATOR_TYPE \
+      && ((OperatorToken *)token)->arity == INFIX)
+    *whichPosition = 1;
+  else
+    throwError("Hey! Expected an INFIX operator was not.", \
+                NOT_INFIX_OPERATOR);
+}
+
+void checkOpenBracketInStack(List *operatorStack)
+{
+  List *stackTemp = stackCreate();
+  stackTemp = operatorStack;
+  
+  // printf("head)->symbol) = %s\n", ((OperatorToken *)stackTemp->head->data)->symbol);
+  // printf("head)->symbol) = %d\n", ((OperatorToken *)operatorStack->head->data)->symbol);
+  // printf("*head->symbol = %d\n", *((OperatorToken *)operatorStack->head->data)->symbol);
+ 
+  while((int)*((OperatorToken *)stackTemp->head->data)->symbol != '(' \
+            && stackTemp->head->next != NULL)
+    stackTemp->head = stackTemp->head->next;
+  
+  // printf("head)->symbol) = %s\n", ((OperatorToken *)stackTemp->head->data)->symbol);
+  if((int)*((OperatorToken *)stackTemp->head->data)->symbol != '(' \
+      && stackTemp->head->next == NULL)
+    throwError("Hey! The bracket cannot be paired.",  \
+                CANNOT_PAIR_THE_BRACKET);
 }
 
 /*
