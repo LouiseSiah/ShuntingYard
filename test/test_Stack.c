@@ -236,7 +236,7 @@ void test_stackPush_given_a_stack_holding_two_element_then_push_a_new_element_sh
  *
  *
  */
-void test_stackPop_given_empty_stack_then_do_nothing_should_return_NULL()
+void test_stackPop_given_empty_stack_then_pop_nothing_should_return_NULL()
 {
   List *stack = stackCreate();
   OperatorToken *op = malloc(sizeof (OperatorToken) + sizeof(Token *) * 2);
@@ -284,14 +284,14 @@ void test_stackPop_given_empty_stack_then_do_nothing_should_return_NULL()
 void test_stackPop_given_one_element_stack_then_remove_the_only_element_should_return_NULL()
 {
   IntegerToken *value1 = malloc(sizeof (IntegerToken));
-  IntegerToken *valueRemove = malloc(sizeof (IntegerToken));
   value1->type = TOKEN_INTEGER_TYPE;
   value1->value = 1;
   
   List *stack = stackCreate();
   
   stackPush(stack, value1);
-  valueRemove = (IntegerToken *)stackPop(stack);
+  
+  IntegerToken *valueRemove = (IntegerToken *)stackPop(stack);
 
   TEST_ASSERT_NOT_NULL(stack);
   TEST_ASSERT_NULL(stack->head);
@@ -301,3 +301,243 @@ void test_stackPop_given_one_element_stack_then_remove_the_only_element_should_r
   TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, valueRemove->type);
 }
 
+/*
+ ***********************BEFORE**********************************
+ *                ---------------
+ *          -----|  HEAD| TAIL |----
+ *          |    ---------------   |
+ *          |                      |
+ *         \/                     \/
+ *    IntegerToken             IntegerToken
+ *    -------------------    -------------------
+ *    TOKEN_INTEGER_TYPE|    TOKEN_INTEGER_TYPE|
+ *    2                 |--> 1                 |--->NULL
+ *    ------------------     ------------------
+ *
+ ************************AFTER************************************************
+ *                ---------------
+ *          -----|  HEAD| TAIL |----
+ *          |    ---------------   |
+ *          |                      |
+ *         \/                      |
+ *    IntegerToken        <--------
+ *    -------------------
+ *    TOKEN_INTEGER_TYPE|
+ *    1                 |--->NULL
+ *    ------------------
+ *
+ *  -----------
+ * |elemRemove|---> IntegerToken   
+ * ------------    ---------------------
+ *                  TOKEN_INTEGER_TYPE |
+ *                        2           |--->NULL
+ *                 --------------------        
+ *    
+ *    
+ *
+ */
+void test_stackPop_given_two_element_stack_then_remove_the_head_element_should_return_only_1_element()
+{
+  // IntegerToken *valueRemove = malloc(sizeof (IntegerToken));
+  List *stack = stackCreate();
+  
+  IntegerToken *value1 = malloc(sizeof (IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1;
+  stackPush(stack, value1);
+  
+  IntegerToken *value2 = malloc(sizeof (IntegerToken));
+  value2->type = TOKEN_INTEGER_TYPE;
+  value2->value = 2;
+  stackPush(stack, value2);
+  
+  
+  IntegerToken *valueRemove = (IntegerToken *)stackPop(stack);
+
+  TEST_ASSERT_NOT_NULL(stack);
+  TEST_ASSERT_NOT_NULL(stack->head);
+  TEST_ASSERT_NOT_NULL(stack->tail);
+  TEST_ASSERT_EQUAL(1, stack->length);
+  TEST_ASSERT_EQUAL(1, ((IntegerToken *)stack->head->data)->value);
+  TEST_ASSERT_EQUAL(2, valueRemove->value);
+  TEST_ASSERT_EQUAL_PTR(stack->head, stack->tail);
+  TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, valueRemove->type);
+}
+
+/*
+ ***********************BEFORE**********************************
+ *                ---------------
+ *          -----|  HEAD| TAIL |---------------------------
+ *          |    ---------------                          |
+ *          |                                             |
+ *         \/                     
+ *    IntegerToken             IntegerToken         IntegerToken
+ *    -------------------    -------------------    -------------------
+ *    TOKEN_INTEGER_TYPE|    TOKEN_INTEGER_TYPE|    TOKEN_INTEGER_TYPE|
+ *    3                 |--> 2                 |--> 1                 |--->NULL
+ *    ------------------     ------------------     ------------------
+ *
+ ************************AFTER************************************************
+ *                ---------------
+ *          -----|  HEAD| TAIL |----
+ *          |    ---------------   |
+ *          |                      |
+ *         \/                     \/
+ *    IntegerToken             IntegerToken
+ *    -------------------    -------------------
+ *    TOKEN_INTEGER_TYPE|    TOKEN_INTEGER_TYPE|
+ *    2                 |--> 1                 |--->NULL
+ *    ------------------     ------------------
+ *
+ *  -----------
+ * |elemRemove|---> IntegerToken   
+ * ------------    ---------------------
+ *                  TOKEN_INTEGER_TYPE |
+ *                        3           |--->NULL
+ *                 --------------------        
+ *    
+ *    
+ *
+ */
+void test_stackPop_given_three_element_stack_then_remove_the_head_element_should_return_only_2_element()
+{
+  List *stack = stackCreate();
+  
+  IntegerToken *value1 = malloc(sizeof (IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1;
+  stackPush(stack, value1);
+  
+  IntegerToken *value2 = malloc(sizeof (IntegerToken));
+  value2->type = TOKEN_INTEGER_TYPE;
+  value2->value = 2;
+  stackPush(stack, value2);
+  
+  IntegerToken *value3 = malloc(sizeof (IntegerToken));
+  value3->type = TOKEN_INTEGER_TYPE;
+  value3->value = 3;
+  stackPush(stack, value3);  
+  
+  IntegerToken *valueRemove = (IntegerToken *)stackPop(stack);
+
+  TEST_ASSERT_NOT_NULL(stack);
+  TEST_ASSERT_NOT_NULL(stack->head);
+  TEST_ASSERT_NOT_NULL(stack->tail);
+  TEST_ASSERT_EQUAL(2, stack->length);
+  TEST_ASSERT_EQUAL(2, ((IntegerToken *)stack->head->data)->value);
+  TEST_ASSERT_EQUAL(3, valueRemove->value);
+  TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, valueRemove->type);
+}
+
+/**************BEFORE and AFTER************
+ *                ---------------
+ *          -----|  HEAD| TAIL |----
+ *          |   ---------------    |
+ *          |                      |
+ *         \/                     \/
+ *        NULL                  NULL
+ *
+ *
+ */
+void test_stackRemove_given_empty_stack_then_Remove_nothing_should_return_NULL()
+{
+  List *stack = stackCreate();
+  
+  stackRemove(stack);
+
+ 	TEST_ASSERT_NOT_NULL(stack);
+  TEST_ASSERT_NULL(stack->head);
+  TEST_ASSERT_NULL(stack->tail);
+  TEST_ASSERT_EQUAL(0, stack->length);
+}
+
+/*
+ ***********************BEFORE**********************************
+ *                ---------------
+ *          -----|  HEAD| TAIL |----
+ *          |    ---------------   |
+ *          |                      |
+ *         \/                      |
+ *    IntegerToken        <--------
+ *    -------------------
+ *    TOKEN_INTEGER_TYPE|
+ *    1                 |--->NULL
+ *    ------------------
+ 
+ ************************AFTER************************************************
+ *                ---------------
+ *          -----|  HEAD| TAIL  |----
+ *          |    ---------------    |
+ *          |                       |
+ *         \/                      \/
+ *        NULL                  NULL    
+ *
+ */
+void test_stackRemove_given_one_element_stack_then_remove_the_only_element_should_return_NULL()
+{
+  List *stack = stackCreate();
+  
+  IntegerToken *value1 = malloc(sizeof (IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1;
+  stackPush(stack, value1);
+  
+  stackRemove(stack);
+
+  TEST_ASSERT_NOT_NULL(stack);
+  TEST_ASSERT_NULL(stack->head);
+  TEST_ASSERT_NULL(stack->tail);
+  TEST_ASSERT_EQUAL(0, stack->length);
+}
+
+/*
+ ***********************BEFORE**********************************
+ *                ---------------
+ *          -----|  HEAD| TAIL |----
+ *          |    ---------------   |
+ *          |                      |
+ *         \/                     \/
+ *    IntegerToken             IntegerToken
+ *    -------------------    -------------------
+ *    TOKEN_INTEGER_TYPE|    TOKEN_INTEGER_TYPE|
+ *    2                 |--> 1                 |--->NULL
+ *    ------------------     ------------------
+ *
+ ************************AFTER************************************************
+ *                ---------------
+ *          -----|  HEAD| TAIL |----
+ *          |    ---------------   |
+ *          |                      |
+ *         \/                      |
+ *    IntegerToken        <--------
+ *    -------------------
+ *    TOKEN_INTEGER_TYPE|
+ *    1                 |--->NULL
+ *    ------------------
+ *    
+ *
+ */
+void test_stackRemove_given_two_element_stack_then_remove_the_head_element_should_return_only_1_element()
+{
+  // IntegerToken *valueRemove = malloc(sizeof (IntegerToken));
+  List *stack = stackCreate();
+  
+  IntegerToken *value1 = malloc(sizeof (IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1;
+  stackPush(stack, value1);
+  
+  IntegerToken *value2 = malloc(sizeof (IntegerToken));
+  value2->type = TOKEN_INTEGER_TYPE;
+  value2->value = 2;
+  stackPush(stack, value2);
+  
+  stackRemove(stack);
+
+  TEST_ASSERT_NOT_NULL(stack);
+  TEST_ASSERT_NOT_NULL(stack->head);
+  TEST_ASSERT_NOT_NULL(stack->tail);
+  TEST_ASSERT_EQUAL(1, stack->length);
+  TEST_ASSERT_EQUAL(1, ((IntegerToken *)stack->head->data)->value);
+  TEST_ASSERT_EQUAL_PTR(stack->head, stack->tail);
+}

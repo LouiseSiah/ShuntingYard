@@ -226,6 +226,22 @@ void test_fourthPosition_given_an_PREFIX_OPERATOR_token_should_Catch_the_error(v
 
 void test_checkOpenBracketInStack_given_a_stack_with_openBracket_inside_should_no_error(void)
 {
+  IntegerToken *value1 = malloc(sizeof(IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1; 
+  List *intStack = stackCreate();
+  stackPush(intStack, value1);
+
+  IntegerToken *value2 = malloc(sizeof(IntegerToken));
+  value2->type = TOKEN_INTEGER_TYPE;
+  value2->value = 2; 
+  stackPush(intStack, value2);
+  
+  IntegerToken *value3 = malloc(sizeof(IntegerToken));
+  value3->type = TOKEN_INTEGER_TYPE;
+  value3->value = 3; 
+  stackPush(intStack, value3);
+  
   List *opStack = stackCreate();
   OperatorToken *op1 = malloc(sizeof(OperatorToken));
   op1->type = TOKEN_OPERATOR_TYPE;
@@ -235,14 +251,9 @@ void test_checkOpenBracketInStack_given_a_stack_with_openBracket_inside_should_n
   op2->type = TOKEN_OPERATOR_TYPE;
   op2->symbol = "+";
   op2->arity = INFIX;
-  OperatorToken *op3 = malloc(sizeof(OperatorToken));
-  op3->type = TOKEN_OPERATOR_TYPE;
-  op3->symbol = "*";
-  op3->arity = INFIX;
   
   stackPush(opStack, op1);
   stackPush(opStack, op2);
-  stackPush(opStack, op3);
   
   TEST_ASSERT_NOT_NULL(opStack->head);
   TEST_ASSERT_NOT_NULL(opStack->tail);
@@ -308,6 +319,28 @@ void test_checkOpenBracketInStack_given_a_stack_without_openBracket_inside_shoul
 
     freeError(err);
   }
+}
+
+void test_reductionUntilMetOpenBracket_given_an_opStack_and_an_intStack_should_reduction_and_delete_the_openBracket(void)
+{
+  List *opStack = stackCreate();
+  OperatorToken *op1 = malloc(sizeof(OperatorToken));
+  op1->type = TOKEN_OPERATOR_TYPE;
+  op1->symbol = "(";
+  op1->arity = PREFIX;
+  OperatorToken *op2 = malloc(sizeof(OperatorToken));
+  op2->type = TOKEN_OPERATOR_TYPE;
+  op2->symbol = "+";
+  op2->arity = INFIX;
+  OperatorToken *op3 = malloc(sizeof(OperatorToken));
+  op3->type = TOKEN_OPERATOR_TYPE;
+  op3->symbol = "*";
+  op3->arity = INFIX;
+  
+  stackPush(opStack, op1);
+  stackPush(opStack, op2);
+  stackPush(opStack, op3);
+  
 }
 /*
 void test_shuntingYard(void)

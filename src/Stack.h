@@ -37,6 +37,7 @@ List *stackCreate();
 Element *elementCreate(void *data);
 void stackPush(List *stack, void *data);
 Token *stackPop(List *stack);
+void stackRemove(List *stack);
 
 
 #endif // Stack_H

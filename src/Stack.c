@@ -52,15 +52,14 @@ void stackPush(List *stack, void *data)
 Token *stackPop(List *stack)
 {
   Element *del,
-          *elemRemove = malloc(sizeof(Element));
-  
+          *elemRemove;
+
   if(stack->head == NULL)
     return NULL;
   else
   {
     del = stack->head;
-    elemRemove->data = del->data;
-    elemRemove->next = NULL;
+    elemRemove = elementCreate(del->data);
     stack->head = stack->head->next;
     stack->length--;
     free(del);
@@ -74,6 +73,30 @@ Token *stackPop(List *stack)
   
   return ((Token *)elemRemove->data);
 }
+
+
+void stackRemove(List *stack)
+{
+  Element *del;
+  
+  if(stack->head == NULL)
+   return;
+  else
+  {
+    del = stack->head;
+    stack->head = stack->head->next;
+    stack->length--;
+    free(del);
+  }
+  
+  if(stack->head == NULL)
+  {
+    stack->head = stack->tail = NULL;
+    stack->length = 0;
+  }
+  
+}
+
 
 
 

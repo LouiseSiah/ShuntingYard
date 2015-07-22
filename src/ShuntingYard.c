@@ -120,6 +120,12 @@ void checkOpenBracketInStack(List *operatorStack)
                 CANNOT_PAIR_THE_BRACKET);
 }
 
+void reductionUntilMetOpenBracket(List *intStack, List *opStack)
+{
+  while((int)*((OperatorToken *)opStack->head->data)->symbol != '(' )
+    reduction(intStack, opStack);
+}
+
 /*
 Token *shuntingYard()
 {
