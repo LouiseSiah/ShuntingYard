@@ -74,13 +74,12 @@ Token *stackPop(List *stack)
   return ((Token *)elemRemove->data);
 }
 
-
 void stackRemove(List *stack)
 {
   Element *del;
   
   if(stack->head == NULL)
-   return;
+    return;
   else
   {
     del = stack->head;

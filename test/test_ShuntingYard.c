@@ -117,6 +117,7 @@ void test_secondPosition_given_a_OperatorToken_should_Catch_error(void)
   Try
   {
     secondPosition((Token *)op, &position);
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
   }
   Catch(err)
   {
@@ -172,6 +173,7 @@ void test_firstPosition_given_a_not_PREFIX_symbol_should_Catch_the_error(void)
   Try
   {
     firstPosition((Token **)&op, &forFun);
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
   }
   Catch(err)
   {
@@ -184,6 +186,19 @@ void test_firstPosition_given_a_not_PREFIX_symbol_should_Catch_the_error(void)
   }
   
   TEST_ASSERT_EQUAL(0, forFun); 
+}
+
+void test_firstPosition_given_a_IntegerToken_should_give_third_position(void)
+{
+  IntegerToken *value1 = malloc(sizeof(IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1; 
+  
+  int position = 0;
+  
+  firstPosition((Token **)&value1, &position);
+  
+  TEST_ASSERT_EQUAL(3, position);
 }
 
 void test_fourthPosition_given_an_INFIX_OPERATOR_token_should_give_correct_position(void)
@@ -211,12 +226,110 @@ void test_fourthPosition_given_an_PREFIX_OPERATOR_token_should_Catch_the_error(v
   Try
   {
     fourthPosition((Token *)op, &position);
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
   }
   Catch(err)
   {
     TEST_ASSERT_EQUAL_STRING("Hey! Expected an INFIX operator was not.", \
                                err->errorMsg);
     TEST_ASSERT_EQUAL(NOT_INFIX_OPERATOR, err->errorCode);
+
+    freeError(err);
+  }
+  
+  TEST_ASSERT_EQUAL(0, position);
+}
+
+void test_thirdPosition_given_a_increment_POSTFIX_symbol_operatorToken_should_give_fourth_position(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "++";
+  
+  int position = 0;
+  
+  thirdPosition((Token *)op, &position);
+  TEST_ASSERT_EQUAL(4, position); 
+}
+
+void test_thirdPosition_given_a_decrement_POSTFIX_symbol_operatorToken_should_give_fourth_position(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "--";
+  
+  int position = 0;
+  
+  thirdPosition((Token *)op, &position);
+  TEST_ASSERT_EQUAL(4, position); 
+}
+
+void test_thirdPosition_given_a_closingBracket_POSTFIX_symbol_operatorToken_should_give_third_position(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = ")";
+  
+  int position = 0;
+  
+  thirdPosition((Token *)op, &position);
+  TEST_ASSERT_EQUAL(3, position); 
+}
+
+void test_thirdPosition_given_a_INFIX_symbol_operatorToken_should_give_FIRST_position(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "/";
+  op->arity = INFIX;
+  int position = 0;
+  
+  thirdPosition((Token *)op, &position);
+  TEST_ASSERT_EQUAL(1, position); 
+}
+
+void test_thirdPosition_given_a_PREFIX_symbol_operatorToken_should_CATCH_the_error(void)
+{
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "!";
+  op->arity = PREFIX;
+  int position = 0;
+  
+  Try
+  {
+    thirdPosition((Token *)op, &position);
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL_STRING("Hey! Expected either POSTFIX or INFIX operator was not.", \
+                               err->errorMsg);
+    TEST_ASSERT_EQUAL(NOT_POSTFIX_INFIX_OPERATOR, err->errorCode);
+
+    freeError(err);
+  }
+  
+  TEST_ASSERT_EQUAL(0, position);
+}
+
+void test_thirdPosition_given_IntegerToken_should_CATCH_the_error(void)
+{
+  IntegerToken *value1 = malloc(sizeof(IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1; 
+  int position = 0;
+  
+  Try
+  {
+    thirdPosition((Token *)value1, &position);
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL_STRING("Hey! Expected an operator was not.", \
+                               err->errorMsg);
+    TEST_ASSERT_EQUAL(NOT_OPERATOR_AFTER_NUMBER, err->errorCode);
 
     freeError(err);
   }
@@ -321,6 +434,7 @@ void test_checkOpenBracketInStack_given_a_stack_without_openBracket_inside_shoul
   }
 }
 
+/*
 void test_reductionUntilMetOpenBracket_given_an_opStack_and_an_intStack_should_reduction_and_delete_the_openBracket(void)
 {
   List *opStack = stackCreate();
@@ -342,6 +456,8 @@ void test_reductionUntilMetOpenBracket_given_an_opStack_and_an_intStack_should_r
   stackPush(opStack, op3);
   
 }
+*/
+
 /*
 void test_shuntingYard(void)
 {
