@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "ErrorObject.h"
 
-#define CEXCEPTION_T      ErrorObject * //change error type from uint to struct type 
+#define CEXCEPTION_T      ErrorObject* //change error type from uint to struct type 
 #define CEXCEPTION_NONE   NULL          //can change to different type
 
 

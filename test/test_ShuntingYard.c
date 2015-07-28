@@ -4,6 +4,7 @@
 #include "mock_Token.h"
 #include "TokenExtend.h"
 #include "ErrorObject.h"
+#include "CException.h"
 #include <malloc.h>
 #include <stdio.h>
 
@@ -106,13 +107,12 @@ void test_secondPosition_given_a_IntegerToken_should_give_correct_position(void)
 
 void test_secondPosition_given_a_OperatorToken_should_Catch_error(void)
 {
+  ErrorObject *err;
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "(";
   
   int position = 0;
-  
-  ErrorObject *err;
 
   Try
   {
@@ -143,7 +143,7 @@ void test_firstPosition_given_a_openBracket_symbol_operatorToken_should_tryConve
   TEST_ASSERT_EQUAL(1, position); 
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(LEFT_TO_RIGHT, op->assoc);
-  TEST_ASSERT_EQUAL(1, op->precedence);
+  TEST_ASSERT_EQUAL(13, op->precedence);
   TEST_ASSERT_EQUAL_PTR("(", op->symbol);
 }
 
@@ -159,12 +159,13 @@ void test_firstPosition_given_Prefix_symbol_operatorToken_should_tryConvertToPre
   TEST_ASSERT_EQUAL(2, position); 
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
-  TEST_ASSERT_EQUAL(2, op->precedence);
+  TEST_ASSERT_EQUAL(12, op->precedence);
   TEST_ASSERT_EQUAL_PTR("+", op->symbol);
 }
 
 void test_firstPosition_given_a_not_PREFIX_symbol_should_Catch_the_error(void)
 {
+  ErrorObject *err;
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "=";
@@ -217,6 +218,7 @@ void test_fourthPosition_given_an_INFIX_OPERATOR_token_should_give_correct_posit
 
 void test_fourthPosition_given_an_PREFIX_OPERATOR_token_should_Catch_the_error(void)
 {
+  ErrorObject *err;
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "!";
@@ -290,6 +292,7 @@ void test_thirdPosition_given_a_INFIX_symbol_operatorToken_should_give_FIRST_pos
 
 void test_thirdPosition_given_a_PREFIX_symbol_operatorToken_should_CATCH_the_error(void)
 {
+  ErrorObject *err;
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "!";
@@ -315,6 +318,7 @@ void test_thirdPosition_given_a_PREFIX_symbol_operatorToken_should_CATCH_the_err
 
 void test_thirdPosition_given_IntegerToken_should_CATCH_the_error(void)
 {
+  ErrorObject *err;
   IntegerToken *value1 = malloc(sizeof(IntegerToken));
   value1->type = TOKEN_INTEGER_TYPE;
   value1->value = 1; 
@@ -337,69 +341,104 @@ void test_thirdPosition_given_IntegerToken_should_CATCH_the_error(void)
   TEST_ASSERT_EQUAL(0, position);
 }
 
+/*  opStack
+ * ---------
+ *  head-->  "+"
+ *            |
+ *           \/
+ *           "!"
+ *            |
+ *           \/
+ *  tail--> "("       <-----openBracket found, no error throw
+ *           |
+ *          \/
+ *        NULL
+ */
 void test_checkOpenBracketInStack_given_a_stack_with_openBracket_inside_should_no_error(void)
 {
-  IntegerToken *value1 = malloc(sizeof(IntegerToken));
-  value1->type = TOKEN_INTEGER_TYPE;
-  value1->value = 1; 
-  List *intStack = stackCreate();
-  stackPush(intStack, value1);
-
-  IntegerToken *value2 = malloc(sizeof(IntegerToken));
-  value2->type = TOKEN_INTEGER_TYPE;
-  value2->value = 2; 
-  stackPush(intStack, value2);
-  
-  IntegerToken *value3 = malloc(sizeof(IntegerToken));
-  value3->type = TOKEN_INTEGER_TYPE;
-  value3->value = 3; 
-  stackPush(intStack, value3);
-  
   List *opStack = stackCreate();
   OperatorToken *op1 = malloc(sizeof(OperatorToken));
   op1->type = TOKEN_OPERATOR_TYPE;
   op1->symbol = "(";
-  op1->arity = PREFIX;
   OperatorToken *op2 = malloc(sizeof(OperatorToken));
   op2->type = TOKEN_OPERATOR_TYPE;
-  op2->symbol = "+";
-  op2->arity = INFIX;
-  
+  op2->symbol = "!";
+  OperatorToken *op3 = malloc(sizeof(OperatorToken));
+  op3->type = TOKEN_OPERATOR_TYPE;
+  op3->symbol = "+";
   stackPush(opStack, op1);
   stackPush(opStack, op2);
+  stackPush(opStack, op3);
+  
+  checkOpenBracketInStack(opStack);
   
   TEST_ASSERT_NOT_NULL(opStack->head);
   TEST_ASSERT_NOT_NULL(opStack->tail);
+  TEST_ASSERT_EQUAL_PTR("+", ((OperatorToken *)opStack->head->data)->symbol);
+  TEST_ASSERT_EQUAL_PTR("(", ((OperatorToken *)opStack->tail->data)->symbol);
+}
+
+/*  opStack
+ * ---------
+ *  head-->  "("         <-----openBracket found, no error throw
+ *            |
+ *           \/
+ *           "-"
+ *            |
+ *           \/
+ *  tail--> "*" 
+ *           |
+ *          \/
+ *        NULL
+ */
+void test_checkOpenBracketInStack_given_another_stack_with_openBracket_inside_should_no_error(void)
+{
+  List *opStack = stackCreate();
+  OperatorToken *op1 = malloc(sizeof(OperatorToken));
+  op1->type = TOKEN_OPERATOR_TYPE;
+  op1->symbol = "*";
+  OperatorToken *op2 = malloc(sizeof(OperatorToken));
+  op2->type = TOKEN_OPERATOR_TYPE;
+  op2->symbol = "!";
+  OperatorToken *op3 = malloc(sizeof(OperatorToken));
+  op3->type = TOKEN_OPERATOR_TYPE;
+  op3->symbol = "(";
+  stackPush(opStack, op1);
+  stackPush(opStack, op2);
+  stackPush(opStack, op3);
+   
+  checkOpenBracketInStack(opStack);
  
   // printf("%d = pointer\n", "*"); //pointer
   // printf("%d = ASCII\n", '*'); //ASCII
   // printf("opStack->head)->symbol = %d\n", ((OperatorToken *)opStack->head->data)->symbol);
   // printf("opStack->head)->symbol = %s\n", ((OperatorToken *)opStack->head->data)->symbol);
-  Try
-  {
-    checkOpenBracketInStack(opStack);
-  }
-  Catch(err)
-  {
-    TEST_ASSERT_EQUAL_STRING("Hey! The bracket cannot be paired.", \
-                               err->errorMsg);
-    TEST_ASSERT_EQUAL(CANNOT_PAIR_THE_BRACKET, err->errorCode);
-
-    freeError(err);
-  }
+  TEST_ASSERT_NOT_NULL(opStack->head);
+  TEST_ASSERT_NOT_NULL(opStack->tail);
+  TEST_ASSERT_EQUAL_PTR("(", ((OperatorToken *)opStack->head->data)->symbol);
+  TEST_ASSERT_EQUAL_PTR("*", ((OperatorToken *)opStack->tail->data)->symbol);
 }
 
+/*  opStack
+ * ---------
+ *  head-->  "*"
+ *            |
+ *           \/
+ *  tail--> "+" 
+ *           |
+ *          \/
+ *        NULL        <----- No openBracket found, Error will be thrown
+ */
 void test_checkOpenBracketInStack_given_a_stack_without_openBracket_inside_should_Catch_the_error(void)
 {
+  ErrorObject *err;
   List *opStack = stackCreate();
   OperatorToken *op1 = malloc(sizeof(OperatorToken));
   op1->type = TOKEN_OPERATOR_TYPE;
   op1->symbol = "+";
-  op1->arity = PREFIX;
   OperatorToken *op2 = malloc(sizeof(OperatorToken));
   op2->type = TOKEN_OPERATOR_TYPE;
-  op2->symbol = "+";
-  op2->arity = INFIX;
+  op2->symbol = "*";
   // OperatorToken *op3 = malloc(sizeof(OperatorToken));
   // op3->type = TOKEN_OPERATOR_TYPE;
   // op3->symbol = "*";
@@ -412,15 +451,11 @@ void test_checkOpenBracketInStack_given_a_stack_without_openBracket_inside_shoul
   
   TEST_ASSERT_NOT_NULL(opStack->head);
   TEST_ASSERT_NOT_NULL(opStack->head->next);
-  TEST_ASSERT_NULL(opStack->tail->next);
- 
-  // printf("%d = pointer\n", "*"); //pointer
-  // printf("%d = ASCII\n", '*'); //ASCII
-  // printf("opStack->head)->symbol = %d\n", ((OperatorToken *)opStack->head->data)->symbol);
-  // printf("opStack->head)->symbol = %s\n", ((OperatorToken *)opStack->head->data)->symbol);
+
   Try
   {
     checkOpenBracketInStack(opStack);
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
   }
   Catch(err)
   {
@@ -458,7 +493,6 @@ void test_reductionUntilMetOpenBracket_given_an_opStack_and_an_intStack_should_r
 }
 */
 
-/*
 void test_shuntingYard(void)
 {
   OperatorToken *opPlus = malloc(sizeof(OperatorToken));
@@ -466,6 +500,27 @@ void test_shuntingYard(void)
   opPlus->symbol = "+";
   
   getToken_ExpectAndReturn((Token *)opPlus);
-  shuntingYard(); 
+  
+  IntegerToken *value1 = malloc(sizeof(IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1;
+  
+  getToken_ExpectAndReturn((Token *)value1);
+  
+  OperatorToken *op = malloc(sizeof(OperatorToken));
+  op->type = TOKEN_OPERATOR_TYPE;
+  op->symbol = "$";
+  op->arity = INFIX;
+  
+  getToken_ExpectAndReturn((Token *)op);
+  
+  ErrorObject *err;
+  Try
+  {
+    shuntingYard(); 
+  }
+    Catch(err)
+  {
+    printf("%s\n",err->errorMsg);
+  }
 }
-*/

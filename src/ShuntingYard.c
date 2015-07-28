@@ -5,6 +5,7 @@
 #include "ErrorObject.h"
 #include "CException.h"
 
+
 void reduction(List *intStack, List *opStack)
 {
   OperatorToken *op = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
@@ -39,7 +40,9 @@ void reduction(List *intStack, List *opStack)
 
 void secondPosition(Token *token, int *whichPosition)
 {
-  if(((IntegerToken *)token)->type == TOKEN_INTEGER_TYPE )
+  // printf("+second pos token type = %d\n", ((IntegerToken *)token)->type);
+  // printf("INT  TYPE = %d\n", TOKEN_INTEGER_TYPE);
+  if(token->type == TOKEN_INTEGER_TYPE )
     *whichPosition = 3;
   else
     throwError("Hey! There should be an number after operator.",  \
@@ -48,21 +51,21 @@ void secondPosition(Token *token, int *whichPosition)
 
 void firstPosition(Token **token, int *whichPosition)
 {
+
+
   // printf("HELLO firstPosition\n");
   // printf("token symbol = %s\n", ((OperatorToken *)*token)->symbol);
   // printf("token type= %d\n", ((OperatorToken *)*token)->type);
-  Try
-  {
-    if(((OperatorToken *)*token)->type == TOKEN_OPERATOR_TYPE)
+    if((*token)->type == TOKEN_OPERATOR_TYPE)
     {
       tryConvertToPrefix((Token ***)&token);
-      if( *(((OperatorToken *)*token)->symbol) == '('         \
+      if((int)*(((OperatorToken *)*token)->symbol) == '('         \
           && (int)*(((OperatorToken *)*token)->symbol + 1) == 0)
         *whichPosition = 1;
       else
         *whichPosition = 2;
     }
-    else if(((IntegerToken *)*token)->type == TOKEN_INTEGER_TYPE )
+    else if((*token)->type == TOKEN_INTEGER_TYPE )
     {
       secondPosition(*token, whichPosition);
     }
@@ -71,28 +74,12 @@ void firstPosition(Token **token, int *whichPosition)
       throwError("Hey! Expect expression start with an operator or a number.",  \
                 NEITHER_OPERATOR_NOR_NUMBER);
     }
-  }
-  Catch(err)
-  {
-    switch(err->errorCode)
-    {
-      case FAIL_TO_CONVERT_TO_PREFIX:
-          throwError("Hey! This symbol is not belong to prefix type.", FAIL_TO_CONVERT_TO_PREFIX);
-          break;
-      case NOT_NUMBER_AFTER_OPERATOR:
-          throwError("Hey! There should be an number after operator.", NOT_NUMBER_AFTER_OPERATOR);
-          break;
-      default:
-          throwError("Uknown error caught", UNKNOWN_ERROR);
-          break;
-    }
 
-  }
 }
 
 void fourthPosition(Token *token, int *whichPosition)
 {
-  if(((OperatorToken *)token)->type == TOKEN_OPERATOR_TYPE \
+  if(token->type == TOKEN_OPERATOR_TYPE \
       && ((OperatorToken *)token)->arity == INFIX)
     *whichPosition = 1;
   else
@@ -102,7 +89,7 @@ void fourthPosition(Token *token, int *whichPosition)
 
 void thirdPosition(Token *token, int *whichPosition)
 {
-  if(((OperatorToken *)token)->type == TOKEN_OPERATOR_TYPE)
+  if(token->type == TOKEN_OPERATOR_TYPE)
   {
     if (   (int)*((OperatorToken *)token)->symbol == '+' \
            && (int)*(((OperatorToken *)token)->symbol + 1) == '+' \
@@ -123,24 +110,7 @@ void thirdPosition(Token *token, int *whichPosition)
     else
     {
       if(((OperatorToken *)token)->arity == INFIX)
-      {
-        Try
-        {
-          fourthPosition(token, whichPosition);
-        }
-        Catch(err)
-        {
-          switch(err->errorCode)
-          {
-            case NOT_INFIX_OPERATOR:
-              throwError("Hey! Expected an INFIX operator was not.", NOT_INFIX_OPERATOR);
-              break;
-            default:
-              throwError("Uknown error caught", UNKNOWN_ERROR);
-              break;
-          }
-        }
-      }
+        fourthPosition(token, whichPosition);
       else
         throwError("Hey! Expected either POSTFIX or INFIX operator was not.", NOT_POSTFIX_INFIX_OPERATOR);
     }
@@ -151,59 +121,69 @@ void thirdPosition(Token *token, int *whichPosition)
 
 void checkOpenBracketInStack(List *operatorStack)
 {
-  List *stackTemp = stackCreate();
-  stackTemp = operatorStack;
+  Element *head = NULL;
+  head = operatorStack->head;
 
   // printf("head)->symbol) = %s\n", ((OperatorToken *)stackTemp->head->data)->symbol);
   // printf("head)->symbol) = %d\n", ((OperatorToken *)operatorStack->head->data)->symbol);
   // printf("*head->symbol = %d\n", *((OperatorToken *)operatorStack->head->data)->symbol);
 
-  while((int)*((OperatorToken *)stackTemp->head->data)->symbol != '(' \
-            && stackTemp->head->next != NULL)
-    stackTemp->head = stackTemp->head->next;
+  while((int)*((OperatorToken *)head->data)->symbol != '(' \
+            && head->next != NULL)
+    head = head->next;
 
   // printf("head)->symbol) = %s\n", ((OperatorToken *)stackTemp->head->data)->symbol);
-  if((int)*((OperatorToken *)stackTemp->head->data)->symbol != '(' \
-      && stackTemp->head->next == NULL)
+  if((int)*((OperatorToken *)head->data)->symbol != '(' \
+      && head->next == NULL)
     throwError("Hey! The bracket cannot be paired.",  \
                 CANNOT_PAIR_THE_BRACKET);
 }
 
-void reductionUntilMetOpenBracket(List *intStack, List *opStack)
+void reductionUntilMetOpenBracket(List *intStack, List *opStack) // no yet fnsh
 {
   while((int)*((OperatorToken *)opStack->head->data)->symbol != '(' )
     reduction(intStack, opStack);
 }
 
-/*
 Token *shuntingYard()
 {
   int whichPosition = 1;
   int testing = 1;
 
-  List *numberStack = stackCreate();
-  List *operatorStack = stackCreate();
+  List *intStack = stackCreate();
+  List *opStack = stackCreate();
 
   Token *token = _getToken();
-  while(!= '$')
+  // printf("--->type of Token = %d\n", ((IntegerToken *)token)->type);
+
+  while(1)
   {
-    Token *token = _getToken();
-    printf("HELLO while\n");
-    printf("posiFunc = %d \n", whichPosition);
+    if( token->type == TOKEN_OPERATOR_TYPE)
+    {
+      // printf("symbol of Token = %s\n", ((OperatorToken *)token)->symbol);
+      if( (int)*((OperatorToken *)token)->symbol == '$')
+        break;
+    }
+
+    // printf("posiFunc = %d \n", whichPosition);
 
     switch(whichPosition)
     {
       case 1: firstPosition(&token, &whichPosition); break;
-      case 2: firstPosition(&token, &whichPosition); break;
-      default: printf("HELLO switch\n"); break;
+      case 2: secondPosition(token, &whichPosition); break;
+      case 3: thirdPosition(token, &whichPosition); break;
+      case 4: fourthPosition(token, &whichPosition); break;
+      default: throwError("Hey! Unknown error!.", UNKNOWN_ERROR); break;
     }
 
-    testing = 0;
-    printf("After posiFunc = %d \n", whichPosition);
+    // testing = 0;
+    // printf("After posiFunc = %d \n", whichPosition);
 
+    token = _getToken();
+    // printf("type of Token = %d\n", ((IntegerToken *)token)->type);
+    // printf("???value of Token = %d\n", ((IntegerToken *)token)->value);
   }
 
   return token;
 
 }
-*/

@@ -1,6 +1,8 @@
 #ifndef TokenExtend_H
 #define TokenExtend_H
 #include "Token.h"
+#include "ErrorObject.h"
+#include "CException.h"
 
 void comparePlusOperators(OperatorToken **token); 
 void compareMinusOperators(OperatorToken **token);

@@ -16,14 +16,14 @@ void comparePlusOperators(OperatorToken **token)
   {
     //printf("+\n");
     (*token)->arity = INFIX;
-    (*token)->precedence = 4;
+    (*token)->precedence = 10;
     (*token)->assoc = LEFT_TO_RIGHT;
   }
   else if((int) *(*token)->symbol == '+' && (int) *((*token)->symbol + 1) == '+')
   {
     //printf("++\n");
     (*token)->arity = INFIX;
-    (*token)->precedence = 1;
+    (*token)->precedence = 13;
     (*token)->assoc = LEFT_TO_RIGHT;
   }
 }
@@ -34,7 +34,7 @@ void compareMinusOperators(OperatorToken **token)
   if((int) *(*token)->symbol == '-' && (int) *((*token)->symbol+1) == 0)
   {
     (*token)->arity = INFIX;
-    (*token)->precedence = 4;
+    (*token)->precedence = 10;
     (*token)->assoc = LEFT_TO_RIGHT;
   }
   //else if (=="++")
@@ -45,7 +45,7 @@ void compareAsteriskOperators(OperatorToken **token)
   if((int) *(*token)->symbol == '*' && (int) *((*token)->symbol+1) == 0)
   {
     (*token)->arity = INFIX;
-    (*token)->precedence = 3;
+    (*token)->precedence = 11;
     (*token)->assoc = LEFT_TO_RIGHT;
   }
   //else if (=="++")
@@ -57,7 +57,7 @@ void compareDivideOperators(OperatorToken **token)
   if((int) *(*token)->symbol == '/' && (int) *((*token)->symbol+1) == 0)
   {
     (*token)->arity = INFIX;
-    (*token)->precedence = 3;
+    (*token)->precedence = 11;
     (*token)->assoc = LEFT_TO_RIGHT;
   }
   //else if (=="++")
@@ -66,7 +66,6 @@ void compareDivideOperators(OperatorToken **token)
 Token *_getToken()  //assign attributes
 {
   Token *token = getToken();
-
   if(token->type == TOKEN_OPERATOR_TYPE)
   {
     switch((int) *((OperatorToken *)token)->symbol)
@@ -81,7 +80,7 @@ Token *_getToken()  //assign attributes
   //printf("precedence after = %d\n", ((OperatorToken *)token)->precedence);
     return token;
   }
-  else
+  else 
     return token;
 }
 
@@ -94,7 +93,7 @@ void tryConvertToPrefix(Token ***token)
        && (int) *(((OperatorToken *)**token)->symbol + 1) == 0)
   {
     ((OperatorToken *)**token)->arity = PREFIX;
-    ((OperatorToken *)**token)->precedence = 2;
+    ((OperatorToken *)**token)->precedence = 12;
     ((OperatorToken *)**token)->assoc = RIGHT_TO_LEFT;
   }
 
@@ -103,7 +102,7 @@ void tryConvertToPrefix(Token ***token)
            && (int) *(((OperatorToken *)**token)->symbol + 2) == 0)
   {
     ((OperatorToken *)**token)->arity = PREFIX;
-    ((OperatorToken *)**token)->precedence = 2;
+    ((OperatorToken *)**token)->precedence = 12;
     ((OperatorToken *)**token)->assoc = RIGHT_TO_LEFT;
   }
 
@@ -111,7 +110,7 @@ void tryConvertToPrefix(Token ***token)
           && (int) *(((OperatorToken *)**token)->symbol + 1) == 0)
   {
     ((OperatorToken *)**token)->arity = PREFIX;
-    ((OperatorToken *)**token)->precedence = 2;
+    ((OperatorToken *)**token)->precedence = 12;
     ((OperatorToken *)**token)->assoc = RIGHT_TO_LEFT;
   }
 
@@ -120,7 +119,7 @@ void tryConvertToPrefix(Token ***token)
            && (int) *(((OperatorToken *)**token)->symbol + 2) == 0)
   {
     ((OperatorToken *)**token)->arity = PREFIX;
-    ((OperatorToken *)**token)->precedence = 2;
+    ((OperatorToken *)**token)->precedence = 12;
     ((OperatorToken *)**token)->assoc = RIGHT_TO_LEFT;
   }
 
@@ -128,7 +127,7 @@ void tryConvertToPrefix(Token ***token)
           && (int) *(((OperatorToken *)**token)->symbol + 1) == 0)
   {
     ((OperatorToken *)**token)->arity = PREFIX;
-    ((OperatorToken *)**token)->precedence = 2;
+    ((OperatorToken *)**token)->precedence = 12;
     ((OperatorToken *)**token)->assoc = RIGHT_TO_LEFT;
   }
 
@@ -136,7 +135,7 @@ void tryConvertToPrefix(Token ***token)
           && (int) *(((OperatorToken *)**token)->symbol + 1) == 0)
   {
     ((OperatorToken *)**token)->arity = PREFIX;
-    ((OperatorToken *)**token)->precedence = 2;
+    ((OperatorToken *)**token)->precedence = 12;
     ((OperatorToken *)**token)->assoc = RIGHT_TO_LEFT;
   }
 
@@ -144,7 +143,7 @@ void tryConvertToPrefix(Token ***token)
           && (int) *(((OperatorToken *)**token)->symbol + 1) == 0)
   {
     ((OperatorToken *)**token)->arity = PREFIX;
-    ((OperatorToken *)**token)->precedence = 1;
+    ((OperatorToken *)**token)->precedence = 13;
     ((OperatorToken *)**token)->assoc = LEFT_TO_RIGHT;
   }
 

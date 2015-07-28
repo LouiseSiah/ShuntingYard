@@ -3,11 +3,8 @@
 
 #include "Stack.h"
 #include "TokenExtend.h"
-#include "ErrorObject.h"
-#include "CException.h"
-//#include "ErrorObject.h"
 
-ErrorObject *err;
+//#include "ErrorObject.h"
 
 void reduction(List *intStack, List *opStack);
 void firstPosition(Token **token, int *whichPosition);
