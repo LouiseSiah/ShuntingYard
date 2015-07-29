@@ -141,11 +141,11 @@ void checkOpenBracketInStack(List *operatorStack)
     throwError("Hey! The bracket cannot be paired.", CANNOT_PAIR_THE_BRACKET);
 }
 
-void reductionUntilMetOpenBracket(List *intStack, List *opStack) // no yet fnsh
-{ 
+void reductionUntilMetOpenBracket(List *intStack, List *opStack)
+{
   while((int)*((OperatorToken *)opStack->head->data)->symbol != '(')
     reduction(intStack, opStack);
-  
+
   // printf("head)->symbol) = %s\n", ((OperatorToken *)opStack->head->data)->symbol);
   if((int)*((OperatorToken *)opStack->head->data)->symbol == '(')
     stackRemove(opStack);
