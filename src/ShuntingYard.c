@@ -19,14 +19,18 @@ void reduction(List *intStack, List *opStack)
 
     rightTK = (OperatorToken *)stackPop(intStack);
     leftTK = (OperatorToken *)stackPop(intStack);
-
+    // printf("rightTK = %d\n", ((IntegerToken *)rightTK)->value);
+    // printf("leftTK = %d\n", ((IntegerToken *)leftTK)->value);
     op->token[0] = (Token *) leftTK;
     op->token[1] = (Token *) rightTK;
+    // printf("tail before end if = %d\n", intStack->tail);
+    // printf("op->Token[0] = %d\n", ((IntegerToken *)op->token[0])->value);
+    // printf("op->Token[1] = %d\n", ((IntegerToken *)op->token[1])->value);
   }
 
   else
   {
-    //printf("PREFIX TREE\n");
+    // printf("PREFIX TREE\n");
     OperatorToken *leftTK = malloc (sizeof(OperatorToken) + sizeof(Token *));
 
     leftTK = (OperatorToken *)stackPop(intStack);
@@ -34,7 +38,12 @@ void reduction(List *intStack, List *opStack)
     op->token[0] = (Token *) leftTK;
   }
 
+  // printf("tail before push  = %d\n", intStack->tail);
   stackPush(intStack, op);
+  // printf("tail = %d\n", intStack->tail);
+  // printf("op symbol = %s\n", op->symbol);
+  // printf("==head->symbol = %d\n", ((OperatorToken *)intStack->head->data)->symbol);
+  // printf("==tail->symbol = %d\n", ((OperatorToken *)intStack->tail->data)->symbol);
   //return (Token *)op;
 }
 
@@ -51,8 +60,6 @@ void secondPosition(Token *token, int *whichPosition)
 
 void firstPosition(Token **token, int *whichPosition)
 {
-
-
   // printf("HELLO firstPosition\n");
   // printf("token symbol = %s\n", ((OperatorToken *)*token)->symbol);
   // printf("token type= %d\n", ((OperatorToken *)*token)->type);
@@ -79,12 +86,10 @@ void firstPosition(Token **token, int *whichPosition)
 
 void fourthPosition(Token *token, int *whichPosition)
 {
-  if(token->type == TOKEN_OPERATOR_TYPE \
-      && ((OperatorToken *)token)->arity == INFIX)
+  if(token->type == TOKEN_OPERATOR_TYPE && ((OperatorToken *)token)->arity == INFIX)
     *whichPosition = 1;
   else
-    throwError("Hey! Expected an INFIX operator was not.", \
-                NOT_INFIX_OPERATOR);
+    throwError("Hey! Expected an INFIX operator was not.", NOT_INFIX_OPERATOR);
 }
 
 void thirdPosition(Token *token, int *whichPosition)
@@ -128,21 +133,26 @@ void checkOpenBracketInStack(List *operatorStack)
   // printf("head)->symbol) = %d\n", ((OperatorToken *)operatorStack->head->data)->symbol);
   // printf("*head->symbol = %d\n", *((OperatorToken *)operatorStack->head->data)->symbol);
 
-  while((int)*((OperatorToken *)head->data)->symbol != '(' \
-            && head->next != NULL)
+  while((int)*((OperatorToken *)head->data)->symbol != '(' && head->next != NULL)
     head = head->next;
 
   // printf("head)->symbol) = %s\n", ((OperatorToken *)stackTemp->head->data)->symbol);
-  if((int)*((OperatorToken *)head->data)->symbol != '(' \
-      && head->next == NULL)
-    throwError("Hey! The bracket cannot be paired.",  \
-                CANNOT_PAIR_THE_BRACKET);
+  if((int)*((OperatorToken *)head->data)->symbol != '(' && head->next == NULL)
+    throwError("Hey! The bracket cannot be paired.", CANNOT_PAIR_THE_BRACKET);
 }
 
 void reductionUntilMetOpenBracket(List *intStack, List *opStack) // no yet fnsh
-{
-  while((int)*((OperatorToken *)opStack->head->data)->symbol != '(' )
+{ 
+  while((int)*((OperatorToken *)opStack->head->data)->symbol != '(')
     reduction(intStack, opStack);
+  
+  // printf("head)->symbol) = %s\n", ((OperatorToken *)opStack->head->data)->symbol);
+  if((int)*((OperatorToken *)opStack->head->data)->symbol == '(')
+    stackRemove(opStack);
+  // printf("REDUC tail = %d\n", opStack->tail);
+  // printf("REDUC head = %d\n", opStack->head);
+  // printf("**head->symbol) = %s\n", ((OperatorToken *)intStack->head->data)->symbol);
+  // printf("**tail->symbol) = %s\n", ((OperatorToken *)intStack->tail->data)->symbol);
 }
 
 Token *shuntingYard()

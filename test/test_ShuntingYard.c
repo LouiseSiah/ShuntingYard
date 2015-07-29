@@ -20,40 +20,33 @@ void test_reduction_given_INFIX_symbol_should_have_two_nodes(void)
 {
   List *intStack = stackCreate();
   List *opStack = stackCreate();
-  
+
   IntegerToken *value1 = malloc(sizeof(IntegerToken));
   value1->type = TOKEN_INTEGER_TYPE;
-  value1->value = 1; 
+  value1->value = 1;
   stackPush(intStack, value1);
 
   IntegerToken *value2 = malloc(sizeof(IntegerToken));
   value2->type = TOKEN_INTEGER_TYPE;
-  value2->value = 2; 
+  value2->value = 2;
   stackPush(intStack, value2);
-  
+
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "+";
   op->arity = INFIX;
-  
   stackPush(opStack, op);
-	
+
   // OperatorToken *root = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
   reduction(intStack, opStack);
-  
-  // TEST_ASSERT_NOT_NULL(root->token[0]);
-  // TEST_ASSERT_NOT_NULL(root->token[1]);
-  // printf("%d value of right node\n", ((IntegerToken *)root->token[1])->value);
-  // printf("%s = symbol of root \n", root->symbol);
-  // printf("%s = symbol of root \n", ((OperatorToken *)intStack->head->data)->symbol);
-  // printf("%d = opstack head \n", opStack->head);
-  // printf("%d = opstack head \n", intStack->head);
-  // printf("%d = opstack length \n", intStack->length);
+
   TEST_ASSERT_EQUAL(2, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[1])->value);
   TEST_ASSERT_EQUAL(1, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[0])->value);
   TEST_ASSERT_EQUAL(1, intStack->length);
-  // TEST_ASSERT_EQUAL(1, ((IntegerToken *)root->token[0])->value);
-  TEST_ASSERT_EQUAL_PTR("+", ((OperatorToken *)intStack->head->data)->symbol); 
+  TEST_ASSERT_EQUAL_PTR("+", ((OperatorToken *)intStack->head->data)->symbol);
+  TEST_ASSERT_EQUAL_PTR("+", ((OperatorToken *)intStack->tail->data)->symbol);
+  TEST_ASSERT_EQUAL(1, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[0])->value);
+  TEST_ASSERT_EQUAL(2, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[1])->value);
 }
 
 /*      +
@@ -62,46 +55,47 @@ void test_reduction_given_INFIX_symbol_should_have_two_nodes(void)
  */
 void test_reduction_given_PREFIX_symbol_should_have_only_one_node(void)
 {
-  List *intStack = stackCreate();
   List *opStack = stackCreate();
-  
+  List *intStack = stackCreate();
+
   IntegerToken *value1 = malloc(sizeof(IntegerToken));
   value1->type = TOKEN_INTEGER_TYPE;
-  value1->value = 1; 
+  value1->value = 1;
   stackPush(intStack, value1);
 
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "-";
   op->arity = PREFIX;
-  
+
   stackPush(opStack, op);
-	
+
   // OperatorToken *root = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
   // root = (OperatorToken *)reduction(intStack, opStack);
   reduction(intStack, opStack);
-  TEST_ASSERT_EQUAL_PTR("-", ((OperatorToken *)intStack->head->data)->symbol); 
+  TEST_ASSERT_EQUAL_PTR("-", ((OperatorToken *)intStack->head->data)->symbol);
+  TEST_ASSERT_EQUAL_PTR("-", ((OperatorToken *)intStack->tail->data)->symbol);
   TEST_ASSERT_EQUAL(1, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[0])->value);
   TEST_ASSERT_EQUAL(1, intStack->length);
-  
+
   // TEST_ASSERT_NOT_NULL(root->token[0]);
   // TEST_ASSERT_NULL(root->token[1]);
 
   // TEST_ASSERT_EQUAL(2,((IntegerToken *)root->token[1])->value);
   // TEST_ASSERT_EQUAL(1, ((IntegerToken *)root->token[0])->value);
-  // TEST_ASSERT_EQUAL_PTR("-", root->symbol); 
+  // TEST_ASSERT_EQUAL_PTR("-", root->symbol);
 }
 
 void test_secondPosition_given_a_IntegerToken_should_give_correct_position(void)
 {
   IntegerToken *value1 = malloc(sizeof(IntegerToken));
   value1->type = TOKEN_INTEGER_TYPE;
-  value1->value = 1; 
-  
+  value1->value = 1;
+
   int position = 0;
-  
+
   secondPosition((Token *)value1, &position);
-  
+
   TEST_ASSERT_EQUAL(3, position);
 }
 
@@ -111,7 +105,7 @@ void test_secondPosition_given_a_OperatorToken_should_Catch_error(void)
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "(";
-  
+
   int position = 0;
 
   Try
@@ -127,7 +121,7 @@ void test_secondPosition_given_a_OperatorToken_should_Catch_error(void)
 
     freeError(err);
   }
-  
+
   TEST_ASSERT_EQUAL(0, position);
 }
 
@@ -136,11 +130,11 @@ void test_firstPosition_given_a_openBracket_symbol_operatorToken_should_tryConve
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "(";
-  
+
   int position = 0;
-  
+
   firstPosition((Token **)&op, &position);
-  TEST_ASSERT_EQUAL(1, position); 
+  TEST_ASSERT_EQUAL(1, position);
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(LEFT_TO_RIGHT, op->assoc);
   TEST_ASSERT_EQUAL(13, op->precedence);
@@ -152,11 +146,11 @@ void test_firstPosition_given_Prefix_symbol_operatorToken_should_tryConvertToPre
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "+";
-  
+
   int position = 0;
-  
+
   firstPosition((Token **)&op, &position);
-  TEST_ASSERT_EQUAL(2, position); 
+  TEST_ASSERT_EQUAL(2, position);
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
   TEST_ASSERT_EQUAL(12, op->precedence);
@@ -169,7 +163,7 @@ void test_firstPosition_given_a_not_PREFIX_symbol_should_Catch_the_error(void)
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "=";
-  
+
   int forFun = 0;
   Try
   {
@@ -185,20 +179,20 @@ void test_firstPosition_given_a_not_PREFIX_symbol_should_Catch_the_error(void)
 
     freeError(err);
   }
-  
-  TEST_ASSERT_EQUAL(0, forFun); 
+
+  TEST_ASSERT_EQUAL(0, forFun);
 }
 
 void test_firstPosition_given_a_IntegerToken_should_give_third_position(void)
 {
   IntegerToken *value1 = malloc(sizeof(IntegerToken));
   value1->type = TOKEN_INTEGER_TYPE;
-  value1->value = 1; 
-  
+  value1->value = 1;
+
   int position = 0;
-  
+
   firstPosition((Token **)&value1, &position);
-  
+
   TEST_ASSERT_EQUAL(3, position);
 }
 
@@ -208,11 +202,11 @@ void test_fourthPosition_given_an_INFIX_OPERATOR_token_should_give_correct_posit
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "+";
   op->arity = INFIX;
-  
+
   int position = 0;
-  
+
   fourthPosition((Token *)op, &position);
-  
+
   TEST_ASSERT_EQUAL(1, position);
 }
 
@@ -223,7 +217,7 @@ void test_fourthPosition_given_an_PREFIX_OPERATOR_token_should_Catch_the_error(v
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "!";
   op->arity = PREFIX;
-  
+
   int position = 0;
   Try
   {
@@ -238,7 +232,7 @@ void test_fourthPosition_given_an_PREFIX_OPERATOR_token_should_Catch_the_error(v
 
     freeError(err);
   }
-  
+
   TEST_ASSERT_EQUAL(0, position);
 }
 
@@ -247,11 +241,11 @@ void test_thirdPosition_given_a_increment_POSTFIX_symbol_operatorToken_should_gi
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "++";
-  
+
   int position = 0;
-  
+
   thirdPosition((Token *)op, &position);
-  TEST_ASSERT_EQUAL(4, position); 
+  TEST_ASSERT_EQUAL(4, position);
 }
 
 void test_thirdPosition_given_a_decrement_POSTFIX_symbol_operatorToken_should_give_fourth_position(void)
@@ -259,11 +253,11 @@ void test_thirdPosition_given_a_decrement_POSTFIX_symbol_operatorToken_should_gi
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "--";
-  
+
   int position = 0;
-  
+
   thirdPosition((Token *)op, &position);
-  TEST_ASSERT_EQUAL(4, position); 
+  TEST_ASSERT_EQUAL(4, position);
 }
 
 void test_thirdPosition_given_a_closingBracket_POSTFIX_symbol_operatorToken_should_give_third_position(void)
@@ -271,11 +265,11 @@ void test_thirdPosition_given_a_closingBracket_POSTFIX_symbol_operatorToken_shou
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = ")";
-  
+
   int position = 0;
-  
+
   thirdPosition((Token *)op, &position);
-  TEST_ASSERT_EQUAL(3, position); 
+  TEST_ASSERT_EQUAL(3, position);
 }
 
 void test_thirdPosition_given_a_INFIX_symbol_operatorToken_should_give_FIRST_position(void)
@@ -285,9 +279,9 @@ void test_thirdPosition_given_a_INFIX_symbol_operatorToken_should_give_FIRST_pos
   op->symbol = "/";
   op->arity = INFIX;
   int position = 0;
-  
+
   thirdPosition((Token *)op, &position);
-  TEST_ASSERT_EQUAL(1, position); 
+  TEST_ASSERT_EQUAL(1, position);
 }
 
 void test_thirdPosition_given_a_PREFIX_symbol_operatorToken_should_CATCH_the_error(void)
@@ -298,7 +292,7 @@ void test_thirdPosition_given_a_PREFIX_symbol_operatorToken_should_CATCH_the_err
   op->symbol = "!";
   op->arity = PREFIX;
   int position = 0;
-  
+
   Try
   {
     thirdPosition((Token *)op, &position);
@@ -312,7 +306,7 @@ void test_thirdPosition_given_a_PREFIX_symbol_operatorToken_should_CATCH_the_err
 
     freeError(err);
   }
-  
+
   TEST_ASSERT_EQUAL(0, position);
 }
 
@@ -321,9 +315,9 @@ void test_thirdPosition_given_IntegerToken_should_CATCH_the_error(void)
   ErrorObject *err;
   IntegerToken *value1 = malloc(sizeof(IntegerToken));
   value1->type = TOKEN_INTEGER_TYPE;
-  value1->value = 1; 
+  value1->value = 1;
   int position = 0;
-  
+
   Try
   {
     thirdPosition((Token *)value1, &position);
@@ -337,7 +331,7 @@ void test_thirdPosition_given_IntegerToken_should_CATCH_the_error(void)
 
     freeError(err);
   }
-  
+
   TEST_ASSERT_EQUAL(0, position);
 }
 
@@ -369,9 +363,9 @@ void test_checkOpenBracketInStack_given_a_stack_with_openBracket_inside_should_n
   stackPush(opStack, op1);
   stackPush(opStack, op2);
   stackPush(opStack, op3);
-  
+
   checkOpenBracketInStack(opStack);
-  
+
   TEST_ASSERT_NOT_NULL(opStack->head);
   TEST_ASSERT_NOT_NULL(opStack->tail);
   TEST_ASSERT_EQUAL_PTR("+", ((OperatorToken *)opStack->head->data)->symbol);
@@ -386,7 +380,7 @@ void test_checkOpenBracketInStack_given_a_stack_with_openBracket_inside_should_n
  *           "-"
  *            |
  *           \/
- *  tail--> "*" 
+ *  tail--> "*"
  *           |
  *          \/
  *        NULL
@@ -406,9 +400,9 @@ void test_checkOpenBracketInStack_given_another_stack_with_openBracket_inside_sh
   stackPush(opStack, op1);
   stackPush(opStack, op2);
   stackPush(opStack, op3);
-   
+
   checkOpenBracketInStack(opStack);
- 
+
   // printf("%d = pointer\n", "*"); //pointer
   // printf("%d = ASCII\n", '*'); //ASCII
   // printf("opStack->head)->symbol = %d\n", ((OperatorToken *)opStack->head->data)->symbol);
@@ -424,7 +418,7 @@ void test_checkOpenBracketInStack_given_another_stack_with_openBracket_inside_sh
  *  head-->  "*"
  *            |
  *           \/
- *  tail--> "+" 
+ *  tail--> "+"
  *           |
  *          \/
  *        NULL        <----- No openBracket found, Error will be thrown
@@ -443,12 +437,12 @@ void test_checkOpenBracketInStack_given_a_stack_without_openBracket_inside_shoul
   // op3->type = TOKEN_OPERATOR_TYPE;
   // op3->symbol = "*";
   // op3->arity = INFIX;
-  
+
   // printf("HERE is start of checking\n");
   stackPush(opStack, op1);
   stackPush(opStack, op2);
   // stackPush(opStack, op3);
-  
+
   TEST_ASSERT_NOT_NULL(opStack->head);
   TEST_ASSERT_NOT_NULL(opStack->head->next);
 
@@ -469,9 +463,29 @@ void test_checkOpenBracketInStack_given_a_stack_without_openBracket_inside_shoul
   }
 }
 
-/*
+/*-------------------BEFORE----------------------------------------||---------------AFTER--------------------------------
+ *  opStack                              intStack                  ||           intStack                     opStack
+ * ---------                            ---------                  ||          ---------                     ----------
+ *  head-->  "+" <-- reducted    head-->  "2" <-- will be reducted ||   head-->  "+"---->token[0]--->1      head----->NULL
+ *            |                            |                       ||          ^  |      token[1]--->2      tail----->NULL
+ *           \/                           \/                       ||   tail--/   |
+ *  tail--> "(" <-- removed      tail--> "1" <-- will be reducted  ||            \/
+ *           |                            |                        ||           NULL
+ *          \/                           \/                        ||         
+ *        NULL                          NULL                       ||         
+ */
 void test_reductionUntilMetOpenBracket_given_an_opStack_and_an_intStack_should_reduction_and_delete_the_openBracket(void)
 {
+  List *intStack = stackCreate();
+  IntegerToken *value1 = malloc(sizeof(IntegerToken));
+  value1->type = TOKEN_INTEGER_TYPE;
+  value1->value = 1;
+  IntegerToken *value2 = malloc(sizeof(IntegerToken));
+  value2->type = TOKEN_INTEGER_TYPE;
+  value2->value = 2;
+  stackPush(intStack, value1);
+  stackPush(intStack, value2);
+
   List *opStack = stackCreate();
   OperatorToken *op1 = malloc(sizeof(OperatorToken));
   op1->type = TOKEN_OPERATOR_TYPE;
@@ -481,43 +495,46 @@ void test_reductionUntilMetOpenBracket_given_an_opStack_and_an_intStack_should_r
   op2->type = TOKEN_OPERATOR_TYPE;
   op2->symbol = "+";
   op2->arity = INFIX;
-  OperatorToken *op3 = malloc(sizeof(OperatorToken));
-  op3->type = TOKEN_OPERATOR_TYPE;
-  op3->symbol = "*";
-  op3->arity = INFIX;
-  
   stackPush(opStack, op1);
   stackPush(opStack, op2);
-  stackPush(opStack, op3);
-  
+
+  reductionUntilMetOpenBracket(intStack, opStack);
+
+  TEST_ASSERT_NULL(opStack->head);
+  TEST_ASSERT_NULL(opStack->tail);
+  TEST_ASSERT_EQUAL_PTR("+", ((OperatorToken *)intStack->head->data)->symbol);
+  // printf("tail->symbol = %d\n", ((OperatorToken *)intStack->tail->data)->symbol);
+  TEST_ASSERT_EQUAL_PTR("+", ((OperatorToken *)intStack->tail->data)->symbol);
+  TEST_ASSERT_EQUAL(1, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[0])->value);
+  TEST_ASSERT_EQUAL(2, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[1])->value);
+
 }
-*/
 
 void test_shuntingYard(void)
 {
   OperatorToken *opPlus = malloc(sizeof(OperatorToken));
   opPlus->type = TOKEN_OPERATOR_TYPE;
   opPlus->symbol = "+";
-  
+
   getToken_ExpectAndReturn((Token *)opPlus);
-  
+
   IntegerToken *value1 = malloc(sizeof(IntegerToken));
   value1->type = TOKEN_INTEGER_TYPE;
   value1->value = 1;
-  
+
   getToken_ExpectAndReturn((Token *)value1);
-  
+
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "$";
   op->arity = INFIX;
-  
+
   getToken_ExpectAndReturn((Token *)op);
-  
+
   ErrorObject *err;
   Try
   {
-    shuntingYard(); 
+    shuntingYard();
   }
     Catch(err)
   {

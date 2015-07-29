@@ -67,6 +67,7 @@ Token *stackPop(List *stack)
   
   if(stack->head == NULL)
   {
+    // printf("Hello?\n");
     stack->head = stack->tail = NULL;
     stack->length = 0;
   }
