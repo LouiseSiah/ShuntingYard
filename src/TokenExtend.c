@@ -4,127 +4,211 @@
 #include "ErrorObject.h"
 #include "CException.h"
 #include "StringTokenizer.h"
-// ttributes operatorAttributesTable[] = {
-  // ['<'] = 		    {30,	INFIX,  errorNud,  infixLed, extendQuadrupleCharacterOperator},
-  // ['>'] = 		    {30,  INFIX,  errorNud,  infixLed, extendQuadrupleCharacterOperator},
-  // ['+'] =		      {50,  PREFIX, prefixNud, infixLed, extendTripleCharacterOperator},
-  // ['-'] = 		    {50,  PREFIX, prefixNud, infixLed, extendTripleCharacterOperator},
-  // ['&'] = 		    {10,  PREFIX, prefixNud, infixLed, extendTripleCharacterOperator},
-  // ['|'] = 		    { 8,  INFIX,  errorNud,  infixLed, extendTripleCharacterOperator},
-  // ['*'] = 		    {60,  PREFIX, prefixNud, infixLed, extendDoubleCharacterOperator},
-  // ['/'] = 		    {60,  INFIX,  errorNud,  infixLed, extendDoubleCharacterOperator},
-  // ['%'] = 		    {60,  INFIX,  errorNud,  infixLed, extendDoubleCharacterOperator},
-  // ['^'] = 		    { 9,  INFIX,  errorNud,  infixLed, extendDoubleCharacterOperator},
-  // ['!'] = 		    {70,  PREFIX, prefixNud, infixLed, extendDoubleCharacterOperator},
-  // ['='] = 		    { 5,  INFIX,  errorNud,  infixLed, extendDoubleCharacterOperator},
-  // ['~'] = 		    {70,  PREFIX, prefixNud, errorLed, extendSingleCharacterOperator},
-  // ['('] = 		    { 1,  PREFIX, prefixNud, infixLed, extendSingleCharacterOperator},
-  // [')'] = 		    { 0,  NOFIX,  prefixNud, infixLed, extendSingleCharacterOperator},
-  // ['['] = 		    { 1,  PREFIX, prefixNud, infixLed, extendSingleCharacterOperator},
-  // [']'] = 		    { 0,  NOFIX,  prefixNud, infixLed, extendSingleCharacterOperator},
-  // ['$'] = 		    { 0,  NOFIX,  errorNud,  infixLed, extendSingleCharacterOperator},
-  // ['#'] = 		    { 1,  NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // ['{'] = 		    { 1,  NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // ['}'] =		      { 1,  NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // ['@'] = 		    { 1,  NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // ['?'] =		      { 1,  NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // ['.'] = 	 	    { 1,  NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // [','] =		      { 1,  NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // [';'] =	 	      { 1,  NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // ['"'] =  		    { 1,  NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // ['\'']=         { 1,  NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // ['`'] =		      { 1,  NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // ['\\']= 	  	  { 1,	NOFIX,  errorNud,  errorLed, extendErrorOperator},
-  // ['a' ... 'z'] = { 1,	NOFIX, 	errorNud,  errorLed, extendCharacterErrorOperator},
-  // ['A' ... 'Z'] = { 1,	NOFIX,	errorNud,  errorLed, extendCharacterErrorOperator},
-  // [48  ...  57] = { 1,	NOFIX,  errorNud,  errorLed, extendIntegerErrorOperator},
+
+// struct Attributes{
+ 	// Arity arity;
+  // Associativity assoc;
+  // uint32_t precedence;
+  // Token* (*extend)(Token *token, operatorAttributes *attributes);
 // };
 
-void comparePlusOperators(OperatorToken **token)
-{
-  // printf("symbol+ = %d\n", '+');
-  // printf("symboltoken = %d (**token)\n", *(*token)->symbol);
-  //printf("symboltoken = %s (**token)\n", (*token)->symbol);
-  //printf("symboltoken = %s (**token)\n", ((*token)->symbol+1));
 
-  //if((int) *(*token)->symbol == '+') //must be '+' cannot "+"
-  if((int) *(*token)->symbol == '+' && (int) *((*token)->symbol + 1) == 0)
+/* Table of attributes about the expression operators
+ */
+Attributes operatorAttributesTable[] = {
+  ['('] = 		    {PREFIX, LEFT_TO_RIGHT, 13, extendSingleCharacterOperator},
+  ['+'] = 		    {INFIX,  LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
+  ['-'] = 		    {INFIX,  LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
+  ['!'] = 		    {PREFIX, RIGHT_TO_LEFT, 12, extendDoubleCharacterOperator},
+  ['~'] = 		    {PREFIX, RIGHT_TO_LEFT, 12, extendQuadrupleCharacterOperator},
+  ['*'] = 		    {INFIX,  LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
+  ['/'] = 		    {INFIX,  LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
+  ['%'] = 		    {INFIX,  LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
+  ['<'] = 		    {INFIX,	 LEFT_TO_RIGHT,  8, extendQuadrupleCharacterOperator},
+  ['>'] = 		    {INFIX,	 LEFT_TO_RIGHT,  8, extendQuadrupleCharacterOperator},
+  ['='] = 		    {INFIX,	 RIGHT_TO_LEFT,  1, extendDoubleCharacterOperator},
+  ['&'] = 		    {INFIX,	 LEFT_TO_RIGHT,  6, extendTripleCharacterOperator},
+  ['^'] = 		    {INFIX,	 LEFT_TO_RIGHT,  5, extendDoubleCharacterOperator},
+  ['|'] = 		    {INFIX,	 LEFT_TO_RIGHT,  4, extendTripleCharacterOperator},
+  ['a' ... 'z'] = {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['A' ... 'Z'] = {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  [48  ...  57] = {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  [')'] = 		    {NOFIX,	 NONE,           0, extendSingleCharacterOperator},
+  ['['] = 		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  [']'] = 		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['$'] = 		    {NOFIX,	 NONE,           0, extendSingleCharacterOperator},
+  ['#'] = 		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['{'] = 		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['}'] =		      {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['@'] = 		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['?'] =		      {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['.'] = 	 	    {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  [','] =		      {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  [';'] =	 	      {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['"'] =  		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['\'']=         {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['`'] =		      {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['\\']= 	  	  {NOFIX,	 NONE,          -1, errorCharactorOperator},
+};
+
+/* Function for the operator that had only one possibility.
+ * E.g.: "(", "~"
+ */
+Token* extendSingleCharacterOperator(Token *op, Attributes *attr)
+{
+  if((int)*(((OperatorToken *)op)->symbol+1) == 0)
   {
-    //printf("+\n");
-    (*token)->arity = INFIX;
-    (*token)->precedence = 10;
-    (*token)->assoc = LEFT_TO_RIGHT;
+    ((OperatorToken *)op)->arity = attr->arity;
+    ((OperatorToken *)op)->assoc = attr->assoc;
+    ((OperatorToken *)op)->precedence = attr->precedence;
   }
-  else if((int) *(*token)->symbol == '+' && (int) *((*token)->symbol + 1) == '+')
-  {
-    //printf("++\n");
-    (*token)->arity = INFIX;
-    (*token)->precedence = 13;
-    (*token)->assoc = LEFT_TO_RIGHT;
-  }
+  else
+    throwError(("%s is an undefined operator.", ((OperatorToken *)op)->symbol), UNDEFINED_OPERATOR);
 }
 
-void compareMinusOperators(OperatorToken **token)
+/* Function for the operator that had two possibilities.
+ * E.g.: 1. "!", "!="
+ *       2. "*", "*="
+ */
+Token* extendDoubleCharacterOperator(Token *op, Attributes *attr)
 {
-  //printf("HEllo, I am Minus Function.\n");
-  if((int) *(*token)->symbol == '-' && (int) *((*token)->symbol+1) == 0)
+  if((int)*(((OperatorToken *)op)->symbol+1) == 0)
   {
-    (*token)->arity = INFIX;
-    (*token)->precedence = 10;
-    (*token)->assoc = LEFT_TO_RIGHT;
+    ((OperatorToken *)op)->arity = attr->arity;
+    ((OperatorToken *)op)->assoc = attr->assoc;
+    ((OperatorToken *)op)->precedence = attr->precedence;
   }
-  //else if (=="++")
+  else if((int)*(((OperatorToken *)op)->symbol+1) == '=')
+  {
+    if((int)*(((OperatorToken *)op)->symbol+2) == 0 \
+        && ((int)*((OperatorToken *)op)->symbol == '!' || (int)*((OperatorToken *)op)->symbol == '='))
+    {
+      ((OperatorToken *)op)->arity = INFIX;
+      ((OperatorToken *)op)->assoc = LEFT_TO_RIGHT;
+      ((OperatorToken *)op)->precedence = 7;
+    }
+    else if((int)*(((OperatorToken *)op)->symbol+2) == 0 \
+        && ((int)*((OperatorToken *)op)->symbol != '!' || (int)*((OperatorToken *)op)->symbol != '='))
+    {
+      ((OperatorToken *)op)->arity = INFIX;
+      ((OperatorToken *)op)->assoc = RIGHT_TO_LEFT;
+      ((OperatorToken *)op)->precedence = 1;
+    }
+    else
+      throwError(("%s is an undefined operator.", ((OperatorToken *)op)->symbol), UNDEFINED_OPERATOR);
+  }
+  else
+    throwError(("%s is an undefined operator.", ((OperatorToken *)op)->symbol), UNDEFINED_OPERATOR);
 }
 
-void compareAsteriskOperators(OperatorToken **token)
+/* Function for the operator that had three possibilities.
+ * E.g.: 1. "+", "++", "+="
+ *       2. "&", "&&", "&="
+ */
+Token* extendTripleCharacterOperator(Token *op, Attributes *attr)
 {
-  if((int) *(*token)->symbol == '*' && (int) *((*token)->symbol+1) == 0)
+  // printf("hello Triple\n");
+  if((int)*(((OperatorToken *)op)->symbol+1) == 0)
   {
-    (*token)->arity = INFIX;
-    (*token)->precedence = 11;
-    (*token)->assoc = LEFT_TO_RIGHT;
+    // printf("hello +\n");
+    ((OperatorToken *)op)->arity = attr->arity;
+    ((OperatorToken *)op)->assoc = attr->assoc;
+    ((OperatorToken *)op)->precedence = attr->precedence;
   }
-  //else if (=="++")
+  else if((int)*(((OperatorToken *)op)->symbol+1) == (int)*((OperatorToken *)op)->symbol \
+          && (int)*(((OperatorToken *)op)->symbol+2) == 0)
+  {    
+    if((int)*((OperatorToken *)op)->symbol == '&')
+    {
+      ((OperatorToken *)op)->arity = INFIX;
+      ((OperatorToken *)op)->assoc = LEFT_TO_RIGHT;
+      ((OperatorToken *)op)->precedence = 3;
+    }
+    else if((int)*((OperatorToken *)op)->symbol == '|')
+    {
+      ((OperatorToken *)op)->arity = INFIX;
+      ((OperatorToken *)op)->assoc = LEFT_TO_RIGHT;
+      ((OperatorToken *)op)->precedence = 2;
+    }
+    else
+    {
+      ((OperatorToken *)op)->arity = POSTFIX;
+      ((OperatorToken *)op)->assoc = LEFT_TO_RIGHT;
+      ((OperatorToken *)op)->precedence = 13;
+    }
+  }
+  else if((int)*(((OperatorToken *)op)->symbol+1) == '=' \
+        && (int)*(((OperatorToken *)op)->symbol+2) == 0)
+  {    
+    ((OperatorToken *)op)->arity = INFIX;
+    ((OperatorToken *)op)->assoc = RIGHT_TO_LEFT;
+    ((OperatorToken *)op)->precedence = 1;
+  }
+  else
+    throwError(("%s is an undefined operator.", ((OperatorToken *)op)->symbol), UNDEFINED_OPERATOR);
 }
 
-void compareDivideOperators(OperatorToken **token)
+/* Function for the operator that had four possibilities.
+ * E.g.: 1. "<", "<<", "<=", "<<="
+ *       2. ">", ">>", ">=", ">>="
+ */
+Token* extendQuadrupleCharacterOperator(Token *op, Attributes *attr)
 {
-  //printf("symboltoken = %s (**token)\n", (*token)->symbol);
-  if((int) *(*token)->symbol == '/' && (int) *((*token)->symbol+1) == 0)
+  if((int)*(((OperatorToken *)op)->symbol+1) == 0     \
+    || ((int)*((OperatorToken *)op)->symbol+1) == '=' \
+    && ((int)*((OperatorToken *)op)->symbol+2) == 0)
   {
-    (*token)->arity = INFIX;
-    (*token)->precedence = 11;
-    (*token)->assoc = LEFT_TO_RIGHT;
+    ((OperatorToken *)op)->arity = INFIX;
+    ((OperatorToken *)op)->assoc = LEFT_TO_RIGHT;
+    ((OperatorToken *)op)->precedence = 8;
   }
-  //else if (=="++")
+  else if((int)*(((OperatorToken *)op)->symbol+1) == (int)*((OperatorToken *)op)->symbol \
+        && (int)*(((OperatorToken *)op)->symbol+2) == 0)
+  {
+    ((OperatorToken *)op)->arity = INFIX;
+    ((OperatorToken *)op)->assoc = LEFT_TO_RIGHT;
+    ((OperatorToken *)op)->precedence = 9;
+  }
+  else if((int)*(((OperatorToken *)op)->symbol+1) == (int)*((OperatorToken *)op)->symbol \
+        && (int)*(((OperatorToken *)op)->symbol+2) == '='                                \
+        && (int)*(((OperatorToken *)op)->symbol+3) == 0)
+  {
+    ((OperatorToken *)op)->arity = INFIX;
+    ((OperatorToken *)op)->assoc = RIGHT_TO_LEFT;
+    ((OperatorToken *)op)->precedence = 1;
+  }
+  else
+    throwError(("%s is an undefined operator.", ((OperatorToken *)op)->symbol), UNDEFINED_OPERATOR);
 }
 
-Token *_getToken()  //assign attributes
+Token* errorCharactorOperator(Token *op, Attributes *attr)
+{
+    throwError(("%s is an undefined operator.", ((OperatorToken *)op)->symbol), UNDEFINED_OPERATOR);
+}
+
+/* This function is to assign attributes for the operator type token,
+ *  it do nothing for other type of token.
+ */
+Token *_getToken()  
 {
   Token *token = getToken();
   if(token->type == TOKEN_OPERATOR_TYPE)
-  {
-    switch((int) *((OperatorToken *)token)->symbol)
-    {
-      case'+': comparePlusOperators((OperatorToken **)&token); break;
-      case'-': compareMinusOperators((OperatorToken **)&token); break;
-      case'*': compareAsteriskOperators((OperatorToken **)&token); break;
-      case'/': compareDivideOperators((OperatorToken **)&token); break;
-      default:break;
-    }
-
-  //printf("precedence after = %d\n", ((OperatorToken *)token)->precedence);
+  { 
+    Attributes *attr = &operatorAttributesTable[(int)*((OperatorToken *)token)->symbol];
+    token = attr->extend(token, attr);
     return token;
   }
   else 
     return token;
 }
 
+/* This function is try to convert operator from Infix type to Prefix type,
+ *  it will throw an error whenever the operator is not belong to Prefix type.
+ *  E.g. : 1. '+' will convert to Prefix type successfully.
+ *         2. '<' will fail to convert to Prefix type.
+ */
 void tryConvertToPrefix(Token ***token)
 {
-  // printf(" token symbol add= %d\n", (int) *((OperatorToken *) *token)->symbol);
-  // printf("OperatorToken token symbol = %s\n", ((OperatorToken *) *token)->symbol);
-  // printf("'+'%d\n", '+');
   if ( (int) *((OperatorToken *)**token)->symbol == '+' \
        && (int) *(((OperatorToken *)**token)->symbol + 1) == 0)
   {

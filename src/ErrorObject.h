@@ -12,6 +12,7 @@ typedef enum
   CANNOT_PAIR_THE_BRACKET,
   UNKNOWN_ERROR,
   UNHANDLE_TOKEN_TYPE,
+  UNDEFINED_OPERATOR,
 } ErrorCode;
 
 typedef struct

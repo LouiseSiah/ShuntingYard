@@ -14,7 +14,7 @@ void thirdPosition(Token *token, int *whichPosition);
 void checkOpenBracketInStack(List *operatorStack);
 void reductionUntilMetOpenBracket(List *intStack, List *opStack);
 int precedenceTokenInOpStackHigher(List *opStack, OperatorToken *token);
-void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token);
+void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token); //no yet
 Token *shuntingYard();
 
 #endif // ShuntingYard_H

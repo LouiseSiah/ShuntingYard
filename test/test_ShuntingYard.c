@@ -468,7 +468,6 @@ void test_checkOpenBracketInStack_given_another_stack_with_openBracket_inside_sh
  */
 void test_checkOpenBracketInStack_given_a_stack_without_openBracket_inside_should_Catch_the_error(void)
 {
-  ErrorObject *err;
   List *opStack = stackCreate();
   OperatorToken *op1 = malloc(sizeof(OperatorToken));
   op1->type = TOKEN_OPERATOR_TYPE;
@@ -489,6 +488,7 @@ void test_checkOpenBracketInStack_given_a_stack_without_openBracket_inside_shoul
   TEST_ASSERT_NOT_NULL(opStack->head);
   TEST_ASSERT_NOT_NULL(opStack->head->next);
 
+  ErrorObject *err;
   Try
   {
     checkOpenBracketInStack(opStack);
@@ -650,6 +650,6 @@ void test_shuntingYard(void)
   }
     Catch(err)
   {
-    printf("%s\n",err->errorMsg);
+    // printf("%s\n",err->errorMsg);
   }
 }

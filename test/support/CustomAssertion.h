@@ -12,13 +12,17 @@
                 }
 
 #define TEST_ASSERT_EQUAL_TOKEN_TREE(expectedOper, token0, token1, actualOper);                   \
-           customTestAssertTokenTree(expectedOper, token0, token1, actualOper, __LINE__);
+         customTestAssertTokenTree(expectedOper, token0, token1, actualOper, __LINE__);
         
 #define TEST_ASSERT_EQUAL_OPERATOR(expectedOper, actualOper);                                     \
-           customTestAssertOperator(expectedOper, actualOper, __LINE__);
+        customTestAssertOperator(expectedOper, actualOper, __LINE__);
 
+#define TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(expectedArity, expectedAssoc, expectedPrecedence, symbol, actualOp); \
+        customTestAssertAttributeOperator(expectedArity, expectedAssoc, expectedPrecedence, symbol, actualOp, __LINE__);
+        
 void customTestAssertTokenTree(Token* expectedOper, Token* token0, Token* token1, OperatorToken *actualOper, int lineNumber);
 void customTestAssertOperator(Token* expectedOper, OperatorToken *actualOper, int lineNumber);
+void customTestAssertAttributeOperator(int expectedArity, int expectedAssoc, int expectedPrecedence, char *symbol, OperatorToken *actualOp, int lineNumber);
 
 
 #endif // CustomAssertion_H

@@ -8,7 +8,8 @@
 //IdentifierToken = 16
 //StringToken = 16
 //OperatorToken = 20
-typedef enum {
+typedef enum
+{
 	TOKEN_UNKNOWN_TYPE,
 	TOKEN_INTEGER_TYPE,
 	TOKEN_OPERATOR_TYPE,
@@ -17,46 +18,54 @@ typedef enum {
 	TOKEN_IDENTIFIER_TYPE,
 } TokenType;
 
-typedef enum {
+typedef enum
+{
 	PREFIX, //-2
 	INFIX,	//2*2
-	POSTFIX	//x++
+	POSTFIX,	//x++
+  NOFIX,
 } Arity;
 
-typedef enum {
+typedef enum
+{
 	NONE,
 	LEFT_TO_RIGHT,
 	RIGHT_TO_LEFT,
 } Associativity;
 
-typedef struct {
+typedef struct
+{
 	TokenType type;
   uint32_t startColumn;
   uint32_t length;
 } Token;
 
-typedef struct {
+typedef struct 
+{
 	TokenType type;
   uint32_t startColumn;
   uint32_t length;
 	int value;
 } IntegerToken;
 
-typedef struct {
+typedef struct 
+{
 	TokenType type;
   uint32_t startColumn;
   uint32_t length;
 	double value;
 } FloatToken;
 
-typedef struct {
+typedef struct 
+{
 	TokenType type;
   uint32_t startColumn;
   uint32_t length;
 	char *name;
 } IdentifierToken, StringToken;
 
-typedef struct {
+typedef struct 
+{
 	TokenType type;
   uint32_t startColumn;
   uint32_t length;
