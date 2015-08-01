@@ -1,13 +1,14 @@
 #include "unity.h"
 #include "ShuntingYard.h"
 #include "Stack.h"
-#include "mock_Token.h"
+#include "Token.h"
+#include "mock_StringTokenizer.h"
 #include "TokenExtend.h"
 #include "ErrorObject.h"
 #include "CException.h"
 #include <malloc.h>
 #include <stdio.h>
-
+#include "CustomAssertion.h"
 void setUp(void){}
 
 void tearDown(void){}
@@ -21,23 +22,16 @@ void test_reduction_given_INFIX_symbol_should_have_two_nodes(void)
   List *intStack = stackCreate();
   List *opStack = stackCreate();
 
-  IntegerToken *value1 = malloc(sizeof(IntegerToken));
-  value1->type = TOKEN_INTEGER_TYPE;
-  value1->value = 1;
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
   stackPush(intStack, value1);
 
-  IntegerToken *value2 = malloc(sizeof(IntegerToken));
-  value2->type = TOKEN_INTEGER_TYPE;
-  value2->value = 2;
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(2);
   stackPush(intStack, value2);
 
-  OperatorToken *op = malloc(sizeof(OperatorToken));
-  op->type = TOKEN_OPERATOR_TYPE;
-  op->symbol = "+";
+  OperatorToken *op = (OperatorToken*)createOperatorToken("+");
   op->arity = INFIX;
   stackPush(opStack, op);
 
-  // OperatorToken *root = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
   reduction(intStack, opStack);
 
   TEST_ASSERT_EQUAL(2, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[1])->value);
@@ -47,6 +41,55 @@ void test_reduction_given_INFIX_symbol_should_have_two_nodes(void)
   TEST_ASSERT_EQUAL_PTR("+", ((OperatorToken *)intStack->tail->data)->symbol);
   TEST_ASSERT_EQUAL(1, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[0])->value);
   TEST_ASSERT_EQUAL(2, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[1])->value);
+}
+
+/*---------------------BEFORE---------------------------||--------------------AFTER--------------------------
+ *           intStack                       opStack     ||        intStack
+ *          ---------                       ----------  ||        --------
+ *   head-->  "*"---->token[0]--->2   head--->"+"       ||  head--> "+"--->token[0]---> 1
+ *             |      token[1]--->3            |        ||       /\  |     token[1]---> "*" ---->token[0]--->2
+ *             |                              \/        ||       |   |                           token[1]--->3
+ *            \/                              NULL      ||  tail--  \/
+ *   tail-->  1                                         ||          NULL
+ *            |                                         ||
+ *           \/                                         ||  opStack| head--->tail--->NULL
+ *           NULL                                       ||  --------
+ */
+void test_reduction_given_an_one_operatorStack_then_reduction_should_give_correct_attribute(void)
+{
+  List *intStack = stackCreate();
+  List *opStack = stackCreate();
+
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  stackPush(intStack, value1);
+
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(2);
+  stackPush(intStack, value2);
+  
+  IntegerToken *value3 = (IntegerToken *)createIntegerToken(3);
+  stackPush(intStack, value3);
+
+  OperatorToken *op = (OperatorToken*)createOperatorToken("+");
+  op->arity = INFIX;
+  stackPush(opStack, op);
+
+  op = (OperatorToken*)createOperatorToken("*");
+  op->arity = INFIX;
+  stackPush(opStack, op);
+
+  // OperatorToken *root = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
+  reduction(intStack, opStack);
+  reduction(intStack, opStack);
+  // printf("symbol of Son = %s \n", ((OperatorToken *)((OperatorToken *)intStack->head->data)->token[1])->symbol);
+  TEST_ASSERT_EQUAL(1, intStack->length);
+  TEST_ASSERT_EQUAL_PTR("+", ((OperatorToken *)intStack->head->data)->symbol);
+  TEST_ASSERT_EQUAL_PTR("+", ((OperatorToken *)intStack->tail->data)->symbol);
+  //TEST_ASSERT_EQUAL_TOKEN_TREE(expectedOper,(Token *)value1, token2, (OperatorToken *)intStack->head->data); 
+  TEST_ASSERT_EQUAL(1, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[0])->value);
+  TEST_ASSERT_EQUAL_PTR("*", ((OperatorToken *)((OperatorToken *)intStack->head->data)->token[1])->symbol);
+  TEST_ASSERT_EQUAL(2, ((IntegerToken *)((OperatorToken *)((OperatorToken *)intStack->head->data)->token[1])->token[0])->value);
+  TEST_ASSERT_EQUAL(3, ((IntegerToken *)((OperatorToken *)((OperatorToken *)intStack->head->data)->token[1])->token[1])->value);
+  // TEST_ASSERT_EQUAL(2, ((IntegerToken *)((OperatorToken *)intStack->head->data)->token[1])->value);
 }
 
 /*      +
@@ -510,25 +553,39 @@ void test_reductionUntilMetOpenBracket_given_an_opStack_and_an_intStack_should_r
 
 }
 
+void test_precedenceTokenInOpStackHigher_given_an_plus_symbol_then_compare_with_multiply_in_stack_should_get_one()
+{
+  int needReduction = -1;
+  List *opStack = stackCreate();
+  
+  OperatorToken *op = (OperatorToken*)createOperatorToken("*");
+  op->arity = INFIX;
+  
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("+");
+  op1->arity = INFIX;
+  List *stack = stackBuild(2, op, op1);
+  
+  printf("symbol of Son = %s \n", ((OperatorToken *)stack->head->data)->symbol);
+  printf("symbol of Son = %s \n", ((OperatorToken *)stack->tail->data)->symbol);
+  // needReduction = precedenceTokenInOpStackHigher(OperatorToken *stackToken, OperatorToken *token);
+}
+
 void test_shuntingYard(void)
 {
   OperatorToken *opPlus = malloc(sizeof(OperatorToken));
   opPlus->type = TOKEN_OPERATOR_TYPE;
   opPlus->symbol = "+";
-
   getToken_ExpectAndReturn((Token *)opPlus);
 
   IntegerToken *value1 = malloc(sizeof(IntegerToken));
   value1->type = TOKEN_INTEGER_TYPE;
   value1->value = 1;
-
   getToken_ExpectAndReturn((Token *)value1);
 
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "$";
   op->arity = INFIX;
-
   getToken_ExpectAndReturn((Token *)op);
 
   ErrorObject *err;

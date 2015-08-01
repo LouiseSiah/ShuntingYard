@@ -11,6 +11,7 @@ typedef enum
   NOT_OPERATOR_AFTER_NUMBER,
   CANNOT_PAIR_THE_BRACKET,
   UNKNOWN_ERROR,
+  UNHANDLE_TOKEN_TYPE,
 } ErrorCode;
 
 typedef struct

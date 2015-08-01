@@ -2,7 +2,7 @@
 #include "Stack.h"
 #include <malloc.h>
 #include <stdio.h>
-#include "mock_Token.h"
+#include "Token.h"
 
 void setUp(void){}
 void tearDown(void){}
@@ -223,6 +223,42 @@ void test_stackPush_given_a_stack_holding_two_element_then_push_a_new_element_sh
   TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, ((IntegerToken *)stack->head->data)->type);
   TEST_ASSERT_EQUAL(TOKEN_INTEGER_TYPE, ((IntegerToken *)stack->tail->data)->type);
   TEST_ASSERT_EQUAL(3, stack->length);
+  TEST_ASSERT_NULL(stack->tail->next);
+}
+
+/*  List * 
+ *  ----
+ *  head---->NULL
+ *  ----
+ *  tail---->NULL
+ *
+ * stackBuild(2, "*", "+");
+ *
+ * RESULT
+ *                      ---------------
+ *                -----|  HEAD| TAIL  |---
+ *               |     ---------------   |
+ *              \/                      \/
+ *            OperatorToken           OperatorToken
+ *            -------                 ------
+ *           |   +  |--------------> |  *  | -------->NULL
+ *           -------                 -------              
+ *
+ */
+void test_stackBuild_given_two_token_should_build_the_stack_sucessfully()
+{
+  OperatorToken *op = (OperatorToken *)createOperatorToken("*");
+  op->arity = INFIX;
+  
+  OperatorToken *op1 = (OperatorToken *)createOperatorToken("+");
+  op1->arity = INFIX;
+  List *stack = stackBuild(2, op, op1);
+  
+  TEST_ASSERT_EQUAL_PTR("+", ((OperatorToken *)stack->head->data)->symbol);
+  TEST_ASSERT_EQUAL_PTR("*", ((OperatorToken *)stack->tail->data)->symbol);
+  TEST_ASSERT_EQUAL(TOKEN_OPERATOR_TYPE, ((IntegerToken *)stack->head->data)->type);
+  TEST_ASSERT_EQUAL(TOKEN_OPERATOR_TYPE, ((IntegerToken *)stack->tail->data)->type);
+  TEST_ASSERT_EQUAL(2, stack->length);
   TEST_ASSERT_NULL(stack->tail->next);
 }
 

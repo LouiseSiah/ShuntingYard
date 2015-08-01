@@ -4,7 +4,7 @@
 #include "TokenExtend.h"
 #include "ErrorObject.h"
 #include "CException.h"
-
+#include "StringTokenizer.h"
 
 void reduction(List *intStack, List *opStack)
 {
@@ -155,45 +155,78 @@ void reductionUntilMetOpenBracket(List *intStack, List *opStack)
   // printf("**tail->symbol) = %s\n", ((OperatorToken *)intStack->tail->data)->symbol);
 }
 
+int precedenceTokenInOpStackHigher(OperatorToken *stackToken, OperatorToken *token)//no test yet
+{
+  if(stackToken->precedence > token->precedence)
+    return 1;
+  else if(stackToken->precedence == token->precedence)
+  {
+    if(stackToken->assoc == LEFT_TO_RIGHT)
+      return 1;
+    else
+      return 0;
+  }
+  else
+    return 0;
+}
+
+void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token) //no test yet
+{
+  int needReduction = -1;
+
+  if(*token->symbol == ')')
+  {
+    checkOpenBracketInStack(opStack);
+    reductionUntilMetOpenBracket(intStack, opStack);
+  }
+  else
+  {
+    needReduction = precedenceTokenInOpStackHigher(((OperatorToken *)opStack->head->data), token);
+    if(needReduction)
+      reduction(intStack, opStack);
+    else
+      stackPush(opStack, token);
+  }
+}
+
 Token *shuntingYard()
 {
   int whichPosition = 1;
-  int testing = 1;
-
   List *intStack = stackCreate();
   List *opStack = stackCreate();
 
   Token *token = _getToken();
-  // printf("--->type of Token = %d\n", ((IntegerToken *)token)->type);
 
   while(1)
   {
-    if( token->type == TOKEN_OPERATOR_TYPE)
+    if(token->type == TOKEN_OPERATOR_TYPE)
     {
-      // printf("symbol of Token = %s\n", ((OperatorToken *)token)->symbol);
-      if( (int)*((OperatorToken *)token)->symbol == '$')
+      if((int)*((OperatorToken *)token)->symbol == '$')
         break;
     }
 
     // printf("posiFunc = %d \n", whichPosition);
-
     switch(whichPosition)
     {
       case 1: firstPosition(&token, &whichPosition); break;
       case 2: secondPosition(token, &whichPosition); break;
       case 3: thirdPosition(token, &whichPosition); break;
       case 4: fourthPosition(token, &whichPosition); break;
-      default: throwError("Hey! Unknown error!.", UNKNOWN_ERROR); break;
+      default: throwError("Hey! Unknown error!", UNKNOWN_ERROR); break;
     }
-
-    // testing = 0;
+    
+    if(token->type == TOKEN_OPERATOR_TYPE && opStack->head == NULL)
+      stackPush(opStack, token);
+    else if(token->type == TOKEN_OPERATOR_TYPE && opStack->head != NULL)
+      tryPushToOpStack(intStack, opStack, (OperatorToken *)token);
+    else if(token->type == TOKEN_INTEGER_TYPE)
+      stackPush(intStack, token);
+    else
+      throwError("Hey! I cannot handle this kind of Token Type yet!", UNHANDLE_TOKEN_TYPE);
+      
     // printf("After posiFunc = %d \n", whichPosition);
-
     token = _getToken();
-    // printf("type of Token = %d\n", ((IntegerToken *)token)->type);
-    // printf("???value of Token = %d\n", ((IntegerToken *)token)->value);
   }
 
-  return token;
-
+  return token; // simply put , actual one is the top token in intStack
 }

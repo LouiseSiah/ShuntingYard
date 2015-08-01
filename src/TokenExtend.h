@@ -4,6 +4,19 @@
 #include "ErrorObject.h"
 #include "CException.h"
 
+// typedef struct Attributes_t Attributes;
+// struct Attributes_t{
+ 	// Arity arity;
+  // Associativity assoc;
+  // uint32_t precedence;
+  // Token* (*extend)(Token *token, Attributes *attributes);
+// };
+
+// Token* extendSingleCharacterOperator(Token *op, Attributes *attr);
+// Token* extendDoubleCharacterOperator(Token *op, Attributes *attr);
+// Token* extendTripleCharacterOperator(Token *op, Attributes *attr);
+// Token* extendQuadrupleCharacterOperator(Token *op, Attributes *attr);
+
 void comparePlusOperators(OperatorToken **token); 
 void compareMinusOperators(OperatorToken **token);
 void compareAsteriskOperators(OperatorToken **token);

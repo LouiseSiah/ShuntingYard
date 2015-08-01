@@ -1,7 +1,8 @@
 #include "unity.h"
 #include "TokenExtend.h"
 #include "Stack.h"
-#include "mock_Token.h"
+#include "Token.h"
+#include "mock_StringTokenizer.h"
 #include "ErrorObject.h"
 #include "CException.h"
 #include <malloc.h>

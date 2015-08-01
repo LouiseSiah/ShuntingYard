@@ -3,6 +3,7 @@
 
 #include "unity.h"
 #include "Token.h"
+#include <stdarg.h>
 
 // #define CUSTOM_TEST_FAIL(lineNo, msg, ...)                                                   \
           // {                                                                           \
@@ -19,6 +20,14 @@
 
 // #define TEST_ASSERT_COORDINATE(within, x, y, z, actual)           \
                 // customTestAssertCoordinate(within, x, y, z, actual, __LINE__)
+                
+// #define STACKBUILD(token, ...)
+        // {                                       \
+          // List *stack = stackCreate();          \
+          // stackPush(stack, token);              \
+        // }
+  
+
 typedef struct Element Element; //the way of pointing to myself
 struct Element
 {
@@ -36,6 +45,7 @@ typedef struct
 List *stackCreate();
 Element *elementCreate(void *data);
 void stackPush(List *stack, void *data);
+List *stackBuild(int num, ...);
 Token *stackPop(List *stack);
 void stackRemove(List *stack);
 

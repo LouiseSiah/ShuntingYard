@@ -96,6 +96,26 @@ void stackRemove(List *stack)
   
 }
 
+List *stackBuild(int num, ...)
+{
+  va_list valist;
+  List *stack = stackCreate();
+  int i;
+
+  /* initialize valist for num number of arguments */
+  va_start(valist, num);
+
+  /* access all the arguments assigned to valist */
+  for (i = 0; i < num; i++)
+  {
+    stackPush(stack, va_arg(valist, void*));
+  }
+  /* clean memory reserved for valist */
+  va_end(valist);
+
+  return stack;
+}
+
 
 
 
