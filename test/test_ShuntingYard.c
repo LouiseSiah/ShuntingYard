@@ -553,6 +553,10 @@ void test_reductionUntilMetOpenBracket_given_an_opStack_and_an_intStack_should_r
 
 }
 
+/* compare precedence of INFIX "+" with "*" which in opStack,
+ * precedence of "*" should be higher than "+".
+ * precedenceTokenInOpStackHigher(opStack, op) should get 1.
+ */
 void test_precedenceTokenInOpStackHigher_given_an_plus_symbol_then_compare_with_multiply_in_stack_should_get_one()
 {
   int needReduction = -1;
@@ -560,14 +564,65 @@ void test_precedenceTokenInOpStackHigher_given_an_plus_symbol_then_compare_with_
   
   OperatorToken *op = (OperatorToken*)createOperatorToken("*");
   op->arity = INFIX;
+  op->precedence = 11;
+  stackPush(opStack, op);
   
-  OperatorToken *op1 = (OperatorToken*)createOperatorToken("+");
-  op1->arity = INFIX;
-  List *stack = stackBuild(2, op, op1);
+  op = (OperatorToken*)createOperatorToken("+");
+  op->arity = INFIX;
+  op->precedence = 10;
   
-  printf("symbol of Son = %s \n", ((OperatorToken *)stack->head->data)->symbol);
-  printf("symbol of Son = %s \n", ((OperatorToken *)stack->tail->data)->symbol);
-  // needReduction = precedenceTokenInOpStackHigher(OperatorToken *stackToken, OperatorToken *token);
+  // printf("symbol of Son = %s \n", ((OperatorToken *)opStack->tail->data)->symbol);
+  needReduction = precedenceTokenInOpStackHigher(opStack, op);
+  TEST_ASSERT_EQUAL(1, needReduction);
+}
+
+/* compare precedence of INFIX "*" with "+" which in opStack,
+ * precedence of "*" should be higher than "+".
+ * precedenceTokenInOpStackHigher(opStack, op) should get 0.
+ */
+void test_precedenceTokenInOpStackHigher_given_an_multiply_symbol_then_compare_with_plus_in_stack_should_get_zero()
+{
+  int needReduction = -1;
+  List *opStack = stackCreate();
+  
+  OperatorToken *op = (OperatorToken*)createOperatorToken("+");
+  op->arity = INFIX;
+  op->precedence = 10;
+  stackPush(opStack, op);
+  
+  op = (OperatorToken*)createOperatorToken("*");
+  op->arity = INFIX;
+  op->precedence = 11;
+  
+  // printf("symbol of Son = %s \n", ((OperatorToken *)opStack->tail->data)->symbol);
+  needReduction = precedenceTokenInOpStackHigher(opStack, op);
+  TEST_ASSERT_EQUAL(0, needReduction);
+}
+
+/* compare precedence of INFIX "+" with "-" which in opStack,
+ * precedence of "+" should be EQUAL to "-".
+ * According to associativity of both, should take the left operator first,
+ * so precedenceTokenInOpStackHigher(opStack, op) should get 1.
+ */
+void test_precedenceTokenInOpStackHigher_given_an_plus_symbol_then_compare_with_minus_in_stack_should_get_1()
+{
+  int needReduction = -1;
+  List *opStack = stackCreate();
+  
+  OperatorToken *op = (OperatorToken*)createOperatorToken("-");
+  op->arity = INFIX;
+  op->precedence = 10;
+  op->assoc = LEFT_TO_RIGHT;
+  stackPush(opStack, op);
+  
+  op = (OperatorToken*)createOperatorToken("+");
+  op->arity = INFIX;
+  op->precedence = 10;
+  op->assoc = LEFT_TO_RIGHT;
+  
+  // printf("symbol of Son = %s \n", ((OperatorToken *)opStack->tail->data)->symbol);
+  needReduction = precedenceTokenInOpStackHigher(opStack, op);
+  TEST_ASSERT_EQUAL(1, needReduction);
 }
 
 void test_shuntingYard(void)

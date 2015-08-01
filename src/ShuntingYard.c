@@ -155,13 +155,13 @@ void reductionUntilMetOpenBracket(List *intStack, List *opStack)
   // printf("**tail->symbol) = %s\n", ((OperatorToken *)intStack->tail->data)->symbol);
 }
 
-int precedenceTokenInOpStackHigher(OperatorToken *stackToken, OperatorToken *token)//no test yet
+int precedenceTokenInOpStackHigher(List *opStack, OperatorToken *token)
 {
-  if(stackToken->precedence > token->precedence)
+  if(((OperatorToken *)opStack->head->data)->precedence > token->precedence)
     return 1;
-  else if(stackToken->precedence == token->precedence)
+  else if(((OperatorToken *)opStack->head->data)->precedence == token->precedence)
   {
-    if(stackToken->assoc == LEFT_TO_RIGHT)
+    if(((OperatorToken *)opStack->head->data)->assoc == LEFT_TO_RIGHT)
       return 1;
     else
       return 0;
@@ -181,7 +181,7 @@ void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token) //no 
   }
   else
   {
-    needReduction = precedenceTokenInOpStackHigher(((OperatorToken *)opStack->head->data), token);
+    needReduction = precedenceTokenInOpStackHigher(opStack, token);
     if(needReduction)
       reduction(intStack, opStack);
     else
