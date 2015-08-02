@@ -5,19 +5,11 @@
 #include "CException.h"
 #include "StringTokenizer.h"
 
-// struct Attributes{
- 	// Arity arity;
-  // Associativity assoc;
-  // uint32_t precedence;
-  // Token* (*extend)(Token *token, operatorAttributes *attributes);
-// };
-
-
 /* Table of attributes about the expression operators
  */
 Attributes operatorAttributesTable[] = {
-  ['('] = 		    {PREFIX, LEFT_TO_RIGHT, 13, extendSingleCharacterOperator},
   ['+'] = 		    {INFIX,  LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
+  ['('] = 		    {PREFIX, LEFT_TO_RIGHT,  0, extendSingleCharacterOperator},
   ['-'] = 		    {INFIX,  LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
   ['!'] = 		    {PREFIX, RIGHT_TO_LEFT, 12, extendDoubleCharacterOperator},
   ['~'] = 		    {PREFIX, RIGHT_TO_LEFT, 12, extendQuadrupleCharacterOperator},
@@ -263,7 +255,7 @@ void tryConvertToPrefix(Token ***token)
           && (int) *(((OperatorToken *)**token)->symbol + 1) == 0)
   {
     ((OperatorToken *)**token)->arity = PREFIX;
-    ((OperatorToken *)**token)->precedence = 13;
+    ((OperatorToken *)**token)->precedence = 0;
     ((OperatorToken *)**token)->assoc = LEFT_TO_RIGHT;
   }
 

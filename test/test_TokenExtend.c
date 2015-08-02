@@ -30,7 +30,7 @@ void test_extendSingleCharacterOperator_given_openBracket_should_give_correct_at
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
   op =(OperatorToken *)attr->extend((Token *)op, attr);
  
-  TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, LEFT_TO_RIGHT, 13, "(", op);
+  TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, LEFT_TO_RIGHT, 0, "(", op);
 }
 
 /* Given                            should catch the error.
@@ -540,7 +540,7 @@ void test_tryConvertToPrefix_given_openBracket_should_convert_to_prefix_successf
   opP = &op;
   tryConvertToPrefix((Token ***)&opP);
 
-  TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, LEFT_TO_RIGHT, 13, "(", op);
+  TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, LEFT_TO_RIGHT, 0, "(", op);
 }
 
 

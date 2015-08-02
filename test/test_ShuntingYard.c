@@ -11,6 +11,7 @@
 #include "CustomAssertion.h"
 
 extern Attributes operatorAttributesTable[];
+
 void setUp(void){}
 
 void tearDown(void){}
@@ -150,7 +151,7 @@ void test_firstPosition_given_a_openBracket_symbol_operatorToken_should_tryConve
   TEST_ASSERT_EQUAL(1, position);
   TEST_ASSERT_EQUAL(PREFIX, op->arity);
   TEST_ASSERT_EQUAL(LEFT_TO_RIGHT, op->assoc);
-  TEST_ASSERT_EQUAL(13, op->precedence);
+  TEST_ASSERT_EQUAL(0, op->precedence);
   TEST_ASSERT_EQUAL_PTR("(", op->symbol);
 }
 
@@ -431,12 +432,8 @@ void test_checkOpenBracketInStack_given_a_stack_without_openBracket_inside_shoul
   }
   Catch(err)
   {
-    // printf("HELLO?\n");
-    // printf("%s\n", err->errorMsg);
-    TEST_ASSERT_EQUAL_STRING("Hey! The bracket cannot be paired.", \
-                               err->errorMsg);
+    TEST_ASSERT_EQUAL_STRING("Hey! The bracket cannot be paired.", err->errorMsg);
     TEST_ASSERT_EQUAL(CANNOT_PAIR_THE_BRACKET, err->errorCode);
-
     freeError(err);
   }
 }
@@ -546,69 +543,277 @@ void test_precedenceTokenInOpStackHigher_given_an_plus_symbol_then_compare_with_
   TEST_ASSERT_EQUAL(1, needReduction);
 }
 
- /*-------------------BEFORE----------------------------------------||---------------AFTER--------------------------------
- *  opStack                              intStack                  ||           intStack                       opStack
- * ---------                            ---------                  ||          ---------                       ----------
- *  head-->  "+" <-- reducted    head-->  "2" <-- will be reducted ||   head-->  "+"-->[0]--->"!"-->[0] = 2    head----->NULL
- *            |                            |                       ||          ^  |    [1]--->2                tail----->NULL
+/* get a OperatorToken-->")", should check the opStack and reduct until met open Bracket.
+ *--------------BEFORE----------------------------------------------||--------------AFTER--------------------------------
+ *  opStack                              intStack                  ||           intStack                 opStack
+ * ---------                            ---------                  ||          ---------                 ----------
+ *  head-->  "+" <--reducted     head-->  "2" <-- will be reducted ||   head-->  "+"---->token[0]-->1    head----->NULL
+ *            |                            |                       ||          ^  |           [1]-->2    tail----->NULL
  *           \/                           \/                       ||   tail--/   |
- *          "!"  <-- reducted   tail-->  "1" <-- will be reducted  ||            \/
+ *   tail-->"("<-- reducted     tail-->  "1" <-- will be reducted  ||            \/
  *           |                            |                        ||           NULL
  *          \/                           \/                        ||         
- *  tail-->"("                          NULL                       ||         
- *          |
- *         \/
- *        NULL
+ *         NULL                        NULL                        ||         
  */
 void test_tryPushToOpStack_given_closingBracket_then_check_openBracket_should_reduct(void)
 {
   OperatorToken *op1 = (OperatorToken*)createOperatorToken("(");
   Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
   op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
-  OperatorToken *op2 = (OperatorToken*)createOperatorToken("!");
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("+");
   attr = &operatorAttributesTable[(int)*(op2->symbol)];
   op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
-  OperatorToken *op3 = (OperatorToken*)createOperatorToken("+");
-  attr = &operatorAttributesTable[(int)*(op3->symbol)];
-  op3 =(OperatorToken *)attr->extend((Token *)op3, attr);
 
-  List *opStack = stackBuild(3, op1, op2, op3);
+  List *opStack = stackBuild(2, op1, op2);
 
   OperatorToken *token = (OperatorToken*)createOperatorToken(")");
   attr = &operatorAttributesTable[(int)*(token->symbol)];
   token =(OperatorToken *)attr->extend((Token *)token, attr);
   IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
   IntegerToken *value2 = (IntegerToken *)createIntegerToken(2);
-  List *intStack = stackBuild(2, value1, value1, value2);
+  List *intStack = stackBuild(2, value1, value2);
   
   tryPushToOpStack(intStack, opStack, token);
+  TEST_ASSERT_EQUAL_TREE(op2, (Token *)value1, (Token *)value2, intStack->head->data);
+  TEST_ASSERT_NULL(opStack->head);
+  TEST_ASSERT_NULL(opStack->tail);
 }
 
-// void test_shuntingYard(void)
-// {
-  // OperatorToken *opPlus = malloc(sizeof(OperatorToken));
-  // opPlus->type = TOKEN_OPERATOR_TYPE;
-  // opPlus->symbol = "+";
-  // getToken_ExpectAndReturn((Token *)opPlus);
+/* get a OperatorToken-->")", should check the opStack and catch the Error.
+ *  opStack                           intStack                  
+ * ---------                         ---------                  
+ *  head-->  "*"                  head-->  "2"  
+ *            |                            |                       
+ *           \/                           \/                       
+ *   tail-->"+"<-- error Catched  tail--> "1" 
+ *           |                            |                       
+ *          \/                           \/                       
+ *         NULL                        NULL                       
+ */
+void test_tryPushToOpStack_given_closingBracket_then_check_opStack_should_catch_error(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("+");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("*");
+  attr = &operatorAttributesTable[(int)*(op2->symbol)];
+  op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
+  List *opStack = stackBuild(2, op1, op2);
 
-  // IntegerToken *value1 = malloc(sizeof(IntegerToken));
-  // value1->type = TOKEN_INTEGER_TYPE;
-  // value1->value = 1;
-  // getToken_ExpectAndReturn((Token *)value1);
+  OperatorToken *token = (OperatorToken*)createOperatorToken(")");
+  attr = &operatorAttributesTable[(int)*(token->symbol)];
+  token =(OperatorToken *)attr->extend((Token *)token, attr);
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(2);
+  List *intStack = stackBuild(2, value1, value2);
+  
+  ErrorObject *err;
+  Try
+  {
+    tryPushToOpStack(intStack, opStack, token);
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
+  }
+  Catch(err)
+  {
+    // printf("HELLO?\n");
+    // printf("%s\n", err->errorMsg);
+    TEST_ASSERT_EQUAL_STRING("Hey! The bracket cannot be paired.", err->errorMsg);
+    TEST_ASSERT_EQUAL(CANNOT_PAIR_THE_BRACKET, err->errorCode);
 
-  // OperatorToken *op = malloc(sizeof(OperatorToken));
-  // op->type = TOKEN_OPERATOR_TYPE;
-  // op->symbol = "$";
-  // op->arity = INFIX;
-  // getToken_ExpectAndReturn((Token *)op);
+    freeError(err);
+  }
+}
 
-  // ErrorObject *err;
-  // Try
-  // {
-    // shuntingYard();
-  // }
-    // Catch(err)
-  // {
-    // // printf("%s\n",err->errorMsg);
-  // }
-// }
+/* get a OperatorToken-->"*", should check the opStack and compare the precedence of the Token in opStack.
+ *--------------BEFORE---------------------||--------------AFTER-----------------------------
+ *  opStack                     intStack   ||  opStack                     intStack 
+ * ---------                    ---------  || ---------                    ---------
+ *  head-->  "+"-->NUL        head--> "2"  ||  head-->  "*"              head--> "2"
+ *           /\                        |   ||            |                        |   
+ *           |                        \/   ||           \/                        \/ 
+ *   tail----                 tail--> "1"  ||  tail--->"+"               tail--> "1"
+ *                                     |   ||           |                         | 
+ *                                    \/   ||          \/                        \/ 
+ *                                  NULL   ||         NULL                     NULL 
+ */
+void test_tryPushToOpStack_given_multiply_then_compare_precedance_should_not_reduct(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("+");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+
+  List *opStack = stackBuild(1, op1);
+
+  OperatorToken *token = (OperatorToken*)createOperatorToken("*");
+  attr = &operatorAttributesTable[(int)*(token->symbol)];
+  token =(OperatorToken *)attr->extend((Token *)token, attr);
+  
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(2);
+  List *intStack = stackBuild(2, value1, value2);
+  
+  tryPushToOpStack(intStack, opStack, token);
+
+  TEST_ASSERT_EQUAL_OPERATOR(token, opStack->head->data);
+  TEST_ASSERT_EQUAL_OPERATOR(op1, opStack->tail->data);
+  TEST_ASSERT_EQUAL(2,((IntegerToken *)intStack->head->data)->value);
+  TEST_ASSERT_EQUAL(1,((IntegerToken *)intStack->tail->data)->value);
+}
+
+/* get a OperatorToken-->"+", should check the opStack and compare the precedence of the Token in opStack.
+ *--------------BEFORE---------------------||--------------AFTER-----------------------------
+ *  opStack                     intStack   ||  opStack                     intStack 
+ * ---------                    ---------  || ---------                    ---------
+ *  head-->  "*"-->NULL       head--> "2"  ||  head-->  "+"-->NULL    head--> "*"---->token[0]---> "1"
+ *           /\                        |   ||            /\                 /\ |      token[1]---> "2"
+ *           |                        \/   ||            |                  |  |   
+ *   tail----                 tail--> "1"  ||  tail----- |            tail--|  | 
+ *                                     |   ||                                 \/ 
+ *                                    \/   ||                                NULL    
+ *                                  NULL   ||                               
+ */
+void test_tryPushToOpStack_given_plus_then_compare_precedance_should_reduct(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("*");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+
+  List *opStack = stackBuild(1, op1);
+
+  OperatorToken *token = (OperatorToken*)createOperatorToken("+");
+  attr = &operatorAttributesTable[(int)*(token->symbol)];
+  token =(OperatorToken *)attr->extend((Token *)token, attr);
+  
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(2);
+  List *intStack = stackBuild(2, value1, value2);
+  
+  tryPushToOpStack(intStack, opStack, token);
+  TEST_ASSERT_EQUAL_OPERATOR(token, opStack->head->data);
+  TEST_ASSERT_EQUAL_OPERATOR(opStack->head->data, opStack->tail->data);
+  TEST_ASSERT_EQUAL_TREE(op1, (Token *)value1, (Token *)value2, intStack->head->data);
+}
+
+/* get a OperatorToken-->"-", should check the opStack and compare the precedence of the Token in opStack.
+ *--------------BEFORE---------------------||--------------AFTER-----------------------------
+ *  opStack                     intStack   ||  opStack                     intStack 
+ * ---------                    ---------  || ---------                    ---------
+ *  head-->  "+"-->NULL       head--> "2"  ||  head-->  "-"-->NULL    head--> "+"---->token[0]---> "1"
+ *           /\                        |   ||            /\                 /\ |      token[1]---> "2"
+ *           |                        \/   ||            |                  |  |   
+ *   tail----                 tail--> "1"  ||  tail----- |            tail--|  | 
+ *                                     |   ||                                 \/ 
+ *                                    \/   ||                                NULL    
+ *                                  NULL   ||                               
+ */
+void test_tryPushToOpStack_given_minus_then_compare_precedance_should_reduct(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("+");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+
+  List *opStack = stackBuild(1, op1);
+
+  OperatorToken *token = (OperatorToken*)createOperatorToken("-");
+  attr = &operatorAttributesTable[(int)*(token->symbol)];
+  token =(OperatorToken *)attr->extend((Token *)token, attr);
+  
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(2);
+  List *intStack = stackBuild(2, value1, value2);
+  
+  tryPushToOpStack(intStack, opStack, token);
+  TEST_ASSERT_EQUAL_OPERATOR(token, opStack->head->data);
+  TEST_ASSERT_EQUAL_OPERATOR(opStack->head->data, opStack->tail->data);
+  TEST_ASSERT_EQUAL_TREE(op1, (Token *)value1, (Token *)value2, intStack->head->data);
+}
+
+/*      -
+ *      |
+ *      2
+ */
+void test_shuntingYard_given_minus_one_should_build_in_tree_with_one_node_only(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("-");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+  getToken_ExpectAndReturn((Token *)op1);
+
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  getToken_ExpectAndReturn((Token *)value1);
+
+  OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  attr = &operatorAttributesTable[(int)*(opEnd->symbol)];
+  opEnd =(OperatorToken *)attr->extend((Token *)opEnd, attr);
+  getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  ErrorObject *err;
+  token = shuntingYard();
+  
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op1, (Token *)value1, (OperatorToken *)token);
+}
+
+/*            +
+ *           / \
+ *          *   4
+ *         / \
+ *        -   5
+ *       /
+ *      1
+ */
+void test_shuntingYard_given_one_expression_should_build_tree_in_intStack(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("(");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+  getToken_ExpectAndReturn((Token *)op1);
+
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("-");
+  attr = &operatorAttributesTable[(int)*(op2->symbol)];
+  op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
+  getToken_ExpectAndReturn((Token *)op2);
+  
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  getToken_ExpectAndReturn((Token *)value1);
+
+  OperatorToken *op3 = (OperatorToken*)createOperatorToken(")");
+  attr = &operatorAttributesTable[(int)*(op3->symbol)];
+  op3 =(OperatorToken *)attr->extend((Token *)op3, attr);
+  getToken_ExpectAndReturn((Token *)op3);
+  
+  OperatorToken *op4 = (OperatorToken*)createOperatorToken("*");
+  attr = &operatorAttributesTable[(int)*(op4->symbol)];
+  op4 =(OperatorToken *)attr->extend((Token *)op4, attr);
+  getToken_ExpectAndReturn((Token *)op4);
+  
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(5);
+  getToken_ExpectAndReturn((Token *)value2);
+  
+  OperatorToken *op5 = (OperatorToken*)createOperatorToken("+");
+  attr = &operatorAttributesTable[(int)*(op5->symbol)];
+  op5 =(OperatorToken *)attr->extend((Token *)op5, attr);
+  getToken_ExpectAndReturn((Token *)op5);
+  
+  IntegerToken *value3 = (IntegerToken *)createIntegerToken(4);
+  getToken_ExpectAndReturn((Token *)value3);
+  
+  OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  attr = &operatorAttributesTable[(int)*(opEnd->symbol)];
+  opEnd =(OperatorToken *)attr->extend((Token *)opEnd, attr);
+  getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  ErrorObject *err;
+  Try
+  {
+    token = shuntingYard();
+  }
+    Catch(err)
+  {
+    printf("%s\n",err->errorMsg);
+  }
+  
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op2, (Token *)value1, (OperatorToken *)((OperatorToken *)((OperatorToken *)token)->token[0])->token[0]);
+  // TEST_ASSERT_EQUAL_TREE(op2, (Token *)value1, (OperatorToken *)token);
+}

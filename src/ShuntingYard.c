@@ -61,15 +61,15 @@ void secondPosition(Token *token, int *whichPosition)
 
 void firstPosition(Token **token, int *whichPosition)
 {
-  // printf("HELLO firstPosition\n");
   // printf("token symbol = %s\n", ((OperatorToken *)*token)->symbol);
   // printf("token type= %d\n", ((OperatorToken *)*token)->type);
     if((*token)->type == TOKEN_OPERATOR_TYPE)
     {
       tryConvertToPrefix((Token ***)&token);
+      
       if((int)*(((OperatorToken *)*token)->symbol) == '('         \
           && (int)*(((OperatorToken *)*token)->symbol + 1) == 0)
-        *whichPosition = 1;
+        *whichPosition = 1;     
       else
         *whichPosition = 2;
     }
@@ -131,13 +131,18 @@ void checkOpenBracketInStack(List *operatorStack)
   head = operatorStack->head;
 
   // printf("head)->symbol) = %s\n", ((OperatorToken *)stackTemp->head->data)->symbol);
-  // printf("head)->symbol) = %d\n", ((OperatorToken *)operatorStack->head->data)->symbol);
-  // printf("*head->symbol = %d\n", *((OperatorToken *)operatorStack->head->data)->symbol);
+  // printf("head)->symbol) = %s\n", ((OperatorToken *)operatorStack->head->data)->symbol);
+  // printf("head->next = %d\n", operatorStack->head->next);
 
+  // printf("head)->symbol) = %s\n", ((OperatorToken *)head->data)->symbol);
+  // printf("next) = %d\n", head->next);
   while((int) *((OperatorToken *)head->data)->symbol != '(' && head->next != NULL)
+  {
+    // printf("head)->symbol) = %s\n", ((OperatorToken *)head->data)->symbol);
     head = head->next;
+    
+  }  
 
-  // printf("head)->symbol) = %s\n", ((OperatorToken *)stackTemp->head->data)->symbol);
   if((int) *((OperatorToken *)head->data)->symbol != '(' && head->next == NULL)
     throwError("Hey! The bracket cannot be paired.", CANNOT_PAIR_THE_BRACKET);
 }
@@ -166,22 +171,24 @@ int precedenceTokenInOpStackHigher(List *opStack, OperatorToken *token)
     return 0;
 }
 
-void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token) //no test yet
+void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token)
 {
   int needReduction = -1;
 
   if(*token->symbol == ')')
   {
+    // printf("Not third lah \n");
     checkOpenBracketInStack(opStack);
     reductionUntilMetOpenBracket(intStack, opStack);
   }
   else
   {
     needReduction = precedenceTokenInOpStackHigher(opStack, token);
+    // printf("need? %d\n", needReduction);
     if(needReduction)
       reduction(intStack, opStack);
-    else
-      stackPush(opStack, token);
+    
+    stackPush(opStack, token);
   }
 }
 
@@ -192,7 +199,7 @@ Token *shuntingYard()
   List *opStack = stackCreate();
 
   Token *token = _getToken();
-
+  // printf("precedence = %d\n", ((OperatorToken *)token)->precedence);
   while(1)
   {
     if(token->type == TOKEN_OPERATOR_TYPE)
@@ -201,7 +208,6 @@ Token *shuntingYard()
         break;
     }
 
-    // printf("posiFunc = %d \n", whichPosition);
     switch(whichPosition)
     {
       case 1: firstPosition(&token, &whichPosition); break;
@@ -210,19 +216,36 @@ Token *shuntingYard()
       case 4: fourthPosition(token, &whichPosition); break;
       default: throwError("Hey! Unknown error!", UNKNOWN_ERROR); break;
     }
+    // printf("After posiFunc = %d \n", whichPosition);
     
     if(token->type == TOKEN_OPERATOR_TYPE && opStack->head == NULL)
+    {
+      
+      // printf("NULL?\n");
       stackPush(opStack, token);
+    }
     else if(token->type == TOKEN_OPERATOR_TYPE && opStack->head != NULL)
+    {
+      // printf("-minus?\n");
       tryPushToOpStack(intStack, opStack, (OperatorToken *)token);
+    }
     else if(token->type == TOKEN_INTEGER_TYPE)
       stackPush(intStack, token);
     else
       throwError("Hey! I cannot handle this kind of Token Type yet!", UNHANDLE_TOKEN_TYPE);
-      
-    // printf("After posiFunc = %d \n", whichPosition);
+    
+    // printf("opStacl->head->symbol %s\n", ((OperatorToken *)opStack->head->data)->symbol);
+    // printf("opStack->next %d\n", opStack->head->next);
     token = _getToken();
   }
 
-  return token; // simply put , actual one is the top token in intStack
+  while(opStack->head != NULL)
+    reduction(intStack, opStack);
+  
+  if(opStack->head != NULL)
+    throwError("Hey! Unknown error!", UNKNOWN_ERROR);
+  if(intStack-> head != intStack->tail)
+    throwError("Hey! Unknown error!", UNKNOWN_ERROR);
+    
+  return (intStack->head->data);
 }
