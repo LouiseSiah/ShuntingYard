@@ -173,12 +173,12 @@ void test_firstPosition_given_Prefix_symbol_operatorToken_should_tryConvertToPre
 
 void test_firstPosition_given_a_not_PREFIX_symbol_should_Catch_the_error(void)
 {
-  ErrorObject *err;
   OperatorToken *op = malloc(sizeof(OperatorToken));
   op->type = TOKEN_OPERATOR_TYPE;
   op->symbol = "=";
 
   int forFun = 0;
+  ErrorObject *err;
   Try
   {
     firstPosition((Token **)&op, &forFun);
@@ -804,16 +804,97 @@ void test_shuntingYard_given_one_expression_should_build_tree_in_intStack(void)
   getToken_ExpectAndReturn((Token *)opEnd);
 
   Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  token = shuntingYard();
+  
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op2, (Token *)value1, (OperatorToken *)((OperatorToken *)((OperatorToken *)token)->token[0])->token[0]);
+  TEST_ASSERT_EQUAL_TREE(op4, (Token *)op2, (Token *)value2, (OperatorToken *)((OperatorToken *)token)->token[0]);
+  TEST_ASSERT_EQUAL_TREE(op5, (Token *)op4, (Token *)value3, (OperatorToken *)token);
+}
+
+/*  ( + )
+ *     ^ 
+ *  error
+ */
+void test_shuntingYard_given_expression_without_integer_should_catch_the_error(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("(");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+  getToken_ExpectAndReturn((Token *)op1);
+
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("+");
+  attr = &operatorAttributesTable[(int)*(op2->symbol)];
+  op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
+  getToken_ExpectAndReturn((Token *)op2);
+  
+  OperatorToken *op3 = (OperatorToken*)createOperatorToken(")");
+  attr = &operatorAttributesTable[(int)*(op3->symbol)];
+  op3 =(OperatorToken *)attr->extend((Token *)op3, attr);
+  getToken_ExpectAndReturn((Token *)op3);
+
+  // OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  // attr = &operatorAttributesTable[(int)*(opEnd->symbol)];
+  // opEnd =(OperatorToken *)attr->extend((Token *)opEnd, attr);
+  // getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
   ErrorObject *err;
   Try
   {
     token = shuntingYard();
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
   }
-    Catch(err)
+  Catch(err)
   {
-    printf("%s\n",err->errorMsg);
+    // printf("%s\n",err->errorMsg);
+    TEST_ASSERT_EQUAL_STRING("Hey! There should be an number after operator.", \
+                               err->errorMsg);
+    TEST_ASSERT_EQUAL(NOT_NUMBER_AFTER_OPERATOR, err->errorCode);
+
+    freeError(err);
   }
+
+}
+
+/*   + * 5
+ *     ^ 
+ *  error
+ */
+void test_shuntingYard_given_expression_with_wrong_prefix_symbol_should_catch_the_error(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("+");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+  getToken_ExpectAndReturn((Token *)op1);
+
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("*");
+  attr = &operatorAttributesTable[(int)*(op2->symbol)];
+  op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
+  getToken_ExpectAndReturn((Token *)op2);
   
-  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op2, (Token *)value1, (OperatorToken *)((OperatorToken *)((OperatorToken *)token)->token[0])->token[0]);
-  // TEST_ASSERT_EQUAL_TREE(op2, (Token *)value1, (OperatorToken *)token);
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(5);
+  // getToken_ExpectAndReturn((Token *)value1);
+
+  // OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  // attr = &operatorAttributesTable[(int)*(opEnd->symbol)];
+  // opEnd =(OperatorToken *)attr->extend((Token *)opEnd, attr);
+  // getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  ErrorObject *err;
+  Try
+  {
+    token = shuntingYard();
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
+  }
+  Catch(err)
+  {
+    // printf("%s\n",err->errorMsg);
+    TEST_ASSERT_EQUAL_STRING("Hey! There should be an number after operator.", \
+                               err->errorMsg);
+    TEST_ASSERT_EQUAL(NOT_NUMBER_AFTER_OPERATOR, err->errorCode);
+
+    freeError(err);
+  }
+
 }
