@@ -46,7 +46,7 @@
 
 Token *createOperatorToken(char *symbol)
 {  
-  OperatorToken* op = malloc(sizeof(OperatorToken)+ sizeof(Token*) * 2);
+  OperatorToken *op = malloc(sizeof(OperatorToken)+ sizeof(Token *) * 2);
   op->type    = TOKEN_OPERATOR_TYPE;
   op->symbol  = symbol;
   //op->arity   = AR;

@@ -11,6 +11,8 @@ void reduction(List *intStack, List *opStack)
   OperatorToken *op = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
   op = (OperatorToken *)stackPop(opStack);
 
+  // printf("op->Token[0] = %d\n", ((IntegerToken *)op->token[0])->value);
+
   if(op->arity == INFIX)
   {
     // printf("INFIX TREE\n");
@@ -32,7 +34,6 @@ void reduction(List *intStack, List *opStack)
   {
     // printf("PREFIX TREE\n");
     OperatorToken *leftTK = malloc (sizeof(OperatorToken) + sizeof(Token *));
-
     leftTK = (OperatorToken *)stackPop(intStack);
 
     op->token[0] = (Token *) leftTK;
@@ -133,11 +134,11 @@ void checkOpenBracketInStack(List *operatorStack)
   // printf("head)->symbol) = %d\n", ((OperatorToken *)operatorStack->head->data)->symbol);
   // printf("*head->symbol = %d\n", *((OperatorToken *)operatorStack->head->data)->symbol);
 
-  while((int)*((OperatorToken *)head->data)->symbol != '(' && head->next != NULL)
+  while((int) *((OperatorToken *)head->data)->symbol != '(' && head->next != NULL)
     head = head->next;
 
   // printf("head)->symbol) = %s\n", ((OperatorToken *)stackTemp->head->data)->symbol);
-  if((int)*((OperatorToken *)head->data)->symbol != '(' && head->next == NULL)
+  if((int) *((OperatorToken *)head->data)->symbol != '(' && head->next == NULL)
     throwError("Hey! The bracket cannot be paired.", CANNOT_PAIR_THE_BRACKET);
 }
 
@@ -145,14 +146,9 @@ void reductionUntilMetOpenBracket(List *intStack, List *opStack)
 {
   while((int)*((OperatorToken *)opStack->head->data)->symbol != '(')
     reduction(intStack, opStack);
-
-  // printf("head)->symbol) = %s\n", ((OperatorToken *)opStack->head->data)->symbol);
+  
   if((int)*((OperatorToken *)opStack->head->data)->symbol == '(')
     stackRemove(opStack);
-  // printf("REDUC tail = %d\n", opStack->tail);
-  // printf("REDUC head = %d\n", opStack->head);
-  // printf("**head->symbol) = %s\n", ((OperatorToken *)intStack->head->data)->symbol);
-  // printf("**tail->symbol) = %s\n", ((OperatorToken *)intStack->tail->data)->symbol);
 }
 
 int precedenceTokenInOpStackHigher(List *opStack, OperatorToken *token)
