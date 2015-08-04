@@ -22,15 +22,15 @@ extern Attributes operatorAttributesTable[];
  * arity:         0                           PREFIX
  * assoc:         0                           LEFT_TO_RIGHT
  * precedence:    0                           13
- * 
+ *
  */
 void test_extendSingleCharacterOperator_given_openBracket_should_give_correct_attributes(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("(");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
   op =(OperatorToken *)attr->extend((Token *)op, attr);
- 
-  TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, LEFT_TO_RIGHT, 0, "(", op);
+
+  TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, LEFT_TO_RIGHT, 13, "(", op);
 }
 
 /* Given                            should catch the error.
@@ -41,13 +41,13 @@ void test_extendSingleCharacterOperator_given_openBracket_should_give_correct_at
  * arity:         0
  * assoc:         0
  * precedence:    0
- * 
+ *
  */
 void test_extendSingleCharacterOperator_given_illegal_symbol_should_catch_the_error(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("~=");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
- 
+
   ErrorObject *err;
   Try
   {
@@ -71,14 +71,14 @@ void test_extendSingleCharacterOperator_given_illegal_symbol_should_catch_the_er
  * arity:         0                           PREFIX
  * assoc:         0                           RIGHT_TO_LEFT
  * precedence:    0                           12
- * 
+ *
  */
 void test_extendDoubleCharacterOperator_given_Invert_should_give_correct_attributes(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("!");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
   op =(OperatorToken *)attr->extend((Token *)op, attr);
- 
+
   TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, RIGHT_TO_LEFT, 12, "!", op);
 }
 
@@ -90,14 +90,14 @@ void test_extendDoubleCharacterOperator_given_Invert_should_give_correct_attribu
  * arity:         0                           INFIX
  * assoc:         0                           RIGHT_TO_LEFT
  * precedence:    0                           1
- * 
+ *
  */
 void test_extendDoubleCharacterOperator_given_divideEqual_should_give_correct_attributes(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("/=");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
   op =(OperatorToken *)attr->extend((Token *)op, attr);
- 
+
   TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(INFIX, RIGHT_TO_LEFT, 1, "/=", op);
 }
 
@@ -109,13 +109,13 @@ void test_extendDoubleCharacterOperator_given_divideEqual_should_give_correct_at
  * arity:         0
  * assoc:         0
  * precedence:    0
- * 
+ *
  */
 void test_extendDoubleCharacterOperator_given_illegal_symbol_should_catch_the_error(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("*==");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
- 
+
   ErrorObject *err;
   Try
   {
@@ -139,14 +139,14 @@ void test_extendDoubleCharacterOperator_given_illegal_symbol_should_catch_the_er
  * arity:         0                           INFIX
  * assoc:         0                           LEFT_TO_RIGHT
  * precedence:    0                           6
- * 
+ *
  */
 void test_extendTripleCharacterOperator_given_Ampersand_should_give_correct_attributes(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("&");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
   op =(OperatorToken *)attr->extend((Token *)op, attr);
- 
+
   TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(INFIX, LEFT_TO_RIGHT, 6, "&", op);
 }
 
@@ -158,14 +158,14 @@ void test_extendTripleCharacterOperator_given_Ampersand_should_give_correct_attr
  * arity:         0                           INFIX
  * assoc:         0                           LEFT_TO_RIGHT
  * precedence:    0                           2
- * 
+ *
  */
 void test_extendTripleCharacterOperator_given_logicalOr_should_give_correct_attributes(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("||");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
   op =(OperatorToken *)attr->extend((Token *)op, attr);
- 
+
   TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(INFIX, LEFT_TO_RIGHT, 2, "||", op);
 }
 
@@ -177,14 +177,14 @@ void test_extendTripleCharacterOperator_given_logicalOr_should_give_correct_attr
  * arity:         0                           INFIX
  * assoc:         0                           RIGHT_TO_LEFT
  * precedence:    0                           1
- * 
+ *
  */
 void test_extendTripleCharacterOperator_given_plusEqual_should_give_correct_attributes(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("+=");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
   op =(OperatorToken *)attr->extend((Token *)op, attr);
- 
+
   TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(INFIX, RIGHT_TO_LEFT, 1, "+=", op);
 }
 
@@ -196,13 +196,13 @@ void test_extendTripleCharacterOperator_given_plusEqual_should_give_correct_attr
  * arity:         0
  * assoc:         0
  * precedence:    0
- * 
+ *
  */
 void test_extendTripleCharacterOperator_given_illegal_symbol_should_catch_the_error(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("-==");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
- 
+
   ErrorObject *err;
   Try
   {
@@ -222,18 +222,18 @@ void test_extendTripleCharacterOperator_given_illegal_symbol_should_catch_the_er
  *            OperatorToken *                 OperatorToken *
  *            --------------                  --------------
  * type:      TOKEN_OPERATOR_TYPE             TOKEN_OPERATOR_TYPE
- * symbol:       '<'                          '<' 
+ * symbol:       '<'                          '<'
  * arity:         0                           INFIX
  * assoc:         0                           LEFT_TO_RIGHT
  * precedence:    0                           8
- * 
+ *
  */
 void test_extendQuadrupleCharacterOperator_given_lessThan_should_give_correct_attributes(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("<");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
   op =(OperatorToken *)attr->extend((Token *)op, attr);
- 
+
   TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(INFIX, LEFT_TO_RIGHT, 8, "<", op);
 }
 
@@ -241,18 +241,18 @@ void test_extendQuadrupleCharacterOperator_given_lessThan_should_give_correct_at
  *            OperatorToken *                 OperatorToken *
  *            --------------                  --------------
  * type:      TOKEN_OPERATOR_TYPE             TOKEN_OPERATOR_TYPE
- * symbol:       '<<='                          '<<=' 
+ * symbol:       '<<='                          '<<='
  * arity:         0                           INFIX
  * assoc:         0                           RIGHT_TO_LEFT
  * precedence:    0                           1
- * 
+ *
  */
 void test_extendQuadrupleCharacterOperator_given_bitwiseShiftLeft_should_give_correct_attributes(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("<<=");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
   op =(OperatorToken *)attr->extend((Token *)op, attr);
- 
+
   TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(INFIX, RIGHT_TO_LEFT, 1, "<<=", op);
 }
 
@@ -264,13 +264,13 @@ void test_extendQuadrupleCharacterOperator_given_bitwiseShiftLeft_should_give_co
  * arity:         0
  * assoc:         0
  * precedence:    0
- * 
+ *
  */
 void test_extendQuadrupleCharacterOperator_given_illegal_symbol_should_catch_the_error(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("<>");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
- 
+
   ErrorObject *err;
   Try
   {
@@ -294,13 +294,13 @@ void test_extendQuadrupleCharacterOperator_given_illegal_symbol_should_catch_the
  * arity:         0
  * assoc:         0
  * precedence:    0
- * 
+ *
  */
 void test_errorCharactorOperator_given_illegal_symbol_should_catch_the_error(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("?");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
- 
+
   ErrorObject *err;
   Try
   {
@@ -324,13 +324,13 @@ void test_errorCharactorOperator_given_illegal_symbol_should_catch_the_error(voi
  * arity:         0
  * assoc:         0
  * precedence:    0
- * 
+ *
  */
 void test_errorCharactorOperator_given_digit_should_catch_the_error(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("1");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
- 
+
   ErrorObject *err;
   Try
   {
@@ -354,13 +354,13 @@ void test_errorCharactorOperator_given_digit_should_catch_the_error(void)
  * arity:         0
  * assoc:         0
  * precedence:    0
- * 
+ *
  */
 void test_errorCharactorOperator_given_alphabet_should_catch_the_error(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("aB");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
- 
+
   ErrorObject *err;
   Try
   {
@@ -385,13 +385,13 @@ void test_errorCharactorOperator_given_alphabet_should_catch_the_error(void)
  * arity:         0                           INFIX
  * assoc:         0                           LEFT_TO_RIGHT
  * precedence:    0                           10
- * 
+ *
  */
 void test__getToken_given_plus_operator_then_called_table_should_give_correct_attributes(void)
 {
   OperatorToken *opPlus = (OperatorToken*)createOperatorToken("+");
   getToken_ExpectAndReturn((Token *)opPlus);
-  
+
   opPlus = (OperatorToken *)_getToken();
 
   TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(INFIX, LEFT_TO_RIGHT, 10, "+", opPlus);
@@ -405,13 +405,13 @@ void test__getToken_given_plus_operator_then_called_table_should_give_correct_at
  * arity:         0                           INFIX
  * assoc:         0                           LEFT_TO_RIGHT
  * precedence:    0                           5
- * 
+ *
  */
 void test__getToken_given_bitwiseXor_then_called_table_should_give_correct_attributes(void)
 {
   OperatorToken *opPlus = (OperatorToken*)createOperatorToken("^");
   getToken_ExpectAndReturn((Token *)opPlus);
-  
+
   opPlus = (OperatorToken *)_getToken();
 
   TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(INFIX, LEFT_TO_RIGHT, 5, "^", opPlus);
@@ -425,13 +425,13 @@ void test__getToken_given_bitwiseXor_then_called_table_should_give_correct_attri
  * arity:         0                           PREFIX
  * assoc:         0                           RIGHT_TO_LEFT
  * precedence:    0                           12
- * 
+ *
  */
 void test__getToken_given_logicalNegation_then_called_table_should_give_correct_attributes(void)
 {
   OperatorToken *opPlus = (OperatorToken*)createOperatorToken("!");
   getToken_ExpectAndReturn((Token *)opPlus);
-  
+
   opPlus = (OperatorToken *)_getToken();
 
   TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, RIGHT_TO_LEFT, 12, "!", opPlus);
@@ -445,7 +445,7 @@ void test__getToken_given_logicalNegation_then_called_table_should_give_correct_
  * arity:         0                           PREFIX
  * assoc:         0                           RIGHT_TO_LEFT
  * precedence:    0                           12
- * 
+ *
  */
 void test_tryConvertToPrefix_given_plus_should_convert_to_prefix_successfully(void)
 {
@@ -453,7 +453,7 @@ void test_tryConvertToPrefix_given_plus_should_convert_to_prefix_successfully(vo
 
   OperatorToken **opP = malloc(sizeof(OperatorToken));
   opP = &op;
-  
+
   tryConvertToPrefix((Token ***)&opP);
 
  TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, RIGHT_TO_LEFT, 12, "+", op);
@@ -467,12 +467,12 @@ void test_tryConvertToPrefix_given_plus_should_convert_to_prefix_successfully(vo
  * arity:         0                           PREFIX
  * assoc:         0                           RIGHT_TO_LEFT
  * precedence:    0                           12
- * 
+ *
  */
 void test_tryConvertToPrefix_given_plus_plus_should_convert_to_prefix_successfully(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("++");
-  
+
   OperatorToken **opP = malloc(sizeof(OperatorToken));
   opP = &op;
   tryConvertToPrefix((Token ***)&opP);
@@ -488,7 +488,7 @@ void test_tryConvertToPrefix_given_plus_plus_should_convert_to_prefix_successful
  * arity:         0                           PREFIX
  * assoc:         0                           RIGHT_TO_LEFT
  * precedence:    0                           12
- * 
+ *
  */
 void test_tryConvertToPrefix_given_minus_should_convert_to_prefix_successfully(void)
 {
@@ -509,12 +509,12 @@ void test_tryConvertToPrefix_given_minus_should_convert_to_prefix_successfully(v
  * arity:         0                           PREFIX
  * assoc:         0                           RIGHT_TO_LEFT
  * precedence:    0                           12
- * 
+ *
  */
 void test_tryConvertToPrefix_given_logicalNOT_should_convert_to_prefix_successfully(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("!");
- 
+
   OperatorToken **opP = malloc(sizeof(OperatorToken));
   opP = &op;
   tryConvertToPrefix((Token ***)&opP);
@@ -530,17 +530,17 @@ void test_tryConvertToPrefix_given_logicalNOT_should_convert_to_prefix_successfu
  * arity:         0                           PREFIX
  * assoc:         0                           LEFT_TO_RIGHT
  * precedence:    0                           13
- * 
+ *
  */
 void test_tryConvertToPrefix_given_openBracket_should_convert_to_prefix_successfully(void)
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("(");
- 
+
   OperatorToken **opP = malloc(sizeof(OperatorToken));
   opP = &op;
   tryConvertToPrefix((Token ***)&opP);
 
-  TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, LEFT_TO_RIGHT, 0, "(", op);
+  TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, LEFT_TO_RIGHT, 13, "(", op);
 }
 
 
@@ -552,7 +552,7 @@ void test_tryConvertToPrefix_given_openBracket_should_convert_to_prefix_successf
  * arity:         0
  * assoc:         0
  * precedence:    0
- * 
+ *
  */
 void test_tryConvertToPrefix_given_plus_plus_plus_should_fail_to_convert_to_prefix(void)
 {
@@ -584,7 +584,7 @@ void test_tryConvertToPrefix_given_plus_plus_plus_should_fail_to_convert_to_pref
  * arity:         0
  * assoc:         0
  * precedence:    0
- * 
+ *
  */
 void test_tryConvertToPrefix_given_greater_symbol_should_fail_to_convert_to_prefix(void)
 {
@@ -609,5 +609,40 @@ void test_tryConvertToPrefix_given_greater_symbol_should_fail_to_convert_to_pref
 
     freeError(err);
   }
+}
 
+/* "*" given, call the function and will get a '0'.
+ */
+void test_isPostfixOperator_given_multiply_should_return_Zero(void)
+{
+  OperatorToken *op = (OperatorToken*)createOperatorToken("(");
+  
+  TEST_ASSERT_EQUAL(0, isPostfixOperator(op));
+}
+
+/* "-" given, call the function and will get a '0'.
+ */
+void test_isPostfixOperator_given_minus_should_return_Zero(void)
+{
+  OperatorToken *op = (OperatorToken*)createOperatorToken("-");
+  
+  TEST_ASSERT_EQUAL(0, isPostfixOperator(op));
+}
+
+/* "++" given, call the function and will get a '1'.
+ */
+void test_isPostfixOperator_given_post_increment_should_return_One(void)
+{
+  OperatorToken *op = (OperatorToken*)createOperatorToken("++");
+  
+  TEST_ASSERT_EQUAL(1, isPostfixOperator(op));
+}
+
+/* ")" given, call the function and will get a '1'.
+ */
+void test_isPostfixOperator_given_closingBracket_should_return_One(void)
+{
+  OperatorToken *op = (OperatorToken*)createOperatorToken(")");
+  
+  TEST_ASSERT_EQUAL(1, isPostfixOperator(op));
 }

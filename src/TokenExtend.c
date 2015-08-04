@@ -8,8 +8,8 @@
 /* Table of attributes about the expression operators
  */
 Attributes operatorAttributesTable[] = {
+  ['('] = 		    {PREFIX, LEFT_TO_RIGHT, 13, extendSingleCharacterOperator},
   ['+'] = 		    {INFIX,  LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
-  ['('] = 		    {PREFIX, LEFT_TO_RIGHT,  0, extendSingleCharacterOperator},
   ['-'] = 		    {INFIX,  LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
   ['!'] = 		    {PREFIX, RIGHT_TO_LEFT, 12, extendDoubleCharacterOperator},
   ['~'] = 		    {PREFIX, RIGHT_TO_LEFT, 12, extendQuadrupleCharacterOperator},
@@ -255,11 +255,31 @@ void tryConvertToPrefix(Token ***token)
           && (int) *(((OperatorToken *)**token)->symbol + 1) == 0)
   {
     ((OperatorToken *)**token)->arity = PREFIX;
-    ((OperatorToken *)**token)->precedence = 0;
+    ((OperatorToken *)**token)->precedence = 13;
     ((OperatorToken *)**token)->assoc = LEFT_TO_RIGHT;
   }
 
   else
     throwError("Hey! This symbol is not belong to prefix type.",  \
                 FAIL_TO_CONVERT_TO_PREFIX);
+}
+
+/* This function is to check is the operator belong to postfix type or not,
+ *  if yes will return 1, 
+ *  else return 0.
+ * Postfix symbol: "--", "++", ")"
+ */
+int isPostfixOperator(OperatorToken *token)
+{
+  if( (int)*((OperatorToken *)token)->symbol == '+' \
+           && (int)*(((OperatorToken *)token)->symbol + 1) == '+' \
+           && (int)*(((OperatorToken *)token)->symbol + 2) == 0 \
+     || (int)*((OperatorToken *)token)->symbol == '-' \
+           && (int)*(((OperatorToken *)token)->symbol + 1) == '-' \
+           && (int)*(((OperatorToken *)token)->symbol + 2) == 0
+     || (int)*((OperatorToken *)token)->symbol == ')' \
+           && (int)*(((OperatorToken *)token)->symbol + 1) == 0)
+    return 1;
+  else
+    return 0;      
 }

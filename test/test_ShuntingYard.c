@@ -29,14 +29,13 @@ void test_reduction_given_INFIX_symbol_should_have_two_nodes(void)
   
   OperatorToken *op = (OperatorToken*)createOperatorToken("+");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
-  op =(OperatorToken *)attr->extend((Token *)op, attr);
+  op = (OperatorToken *)attr->extend((Token *)op, attr);
   List *opStack = stackBuild(1, op);
 
   reduction(intStack, opStack);
 
   TEST_ASSERT_EQUAL_TREE(op, (Token *)value1, (Token *)value2, intStack->head->data);
   TEST_ASSERT_EQUAL(1, intStack->length);
-
 }
 
 /*---------------------BEFORE---------------------------||--------------------AFTER--------------------------
@@ -60,11 +59,11 @@ void test_reduction_given_an_one_operatorStack_then_reduction_should_give_correc
 
   OperatorToken *op1 = (OperatorToken*)createOperatorToken("+");
   Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
-  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+  op1 = (OperatorToken *)attr->extend((Token *)op1, attr);
   
   OperatorToken *op2 = (OperatorToken*)createOperatorToken("*");
   attr = &operatorAttributesTable[(int)*(op2->symbol)];
-  op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
+  op2 = (OperatorToken *)attr->extend((Token *)op2, attr);
   
   List *opStack = stackBuild(2, op1, op2);
   // OperatorToken *root = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
@@ -102,9 +101,7 @@ void test_reduction_given_PREFIX_symbol_should_have_only_one_node(void)
 
 void test_secondPosition_given_a_IntegerToken_should_give_correct_position(void)
 {
-  IntegerToken *value1 = malloc(sizeof(IntegerToken));
-  value1->type = TOKEN_INTEGER_TYPE;
-  value1->value = 1;
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
 
   int position = 0;
 
@@ -115,13 +112,11 @@ void test_secondPosition_given_a_IntegerToken_should_give_correct_position(void)
 
 void test_secondPosition_given_a_OperatorToken_should_Catch_error(void)
 {
-  ErrorObject *err;
-  OperatorToken *op = malloc(sizeof(OperatorToken));
-  op->type = TOKEN_OPERATOR_TYPE;
-  op->symbol = "(";
+  OperatorToken *op = (OperatorToken*)createOperatorToken("(");
 
   int position = 0;
 
+  ErrorObject *err;
   Try
   {
     secondPosition((Token *)op, &position);
@@ -141,41 +136,31 @@ void test_secondPosition_given_a_OperatorToken_should_Catch_error(void)
 
 void test_firstPosition_given_a_openBracket_symbol_operatorToken_should_tryConvertToPrefix_and_First_position(void)
 {
-  OperatorToken *op = malloc(sizeof(OperatorToken));
-  op->type = TOKEN_OPERATOR_TYPE;
-  op->symbol = "(";
+  OperatorToken *op = (OperatorToken*)createOperatorToken("(");
 
   int position = 0;
 
   firstPosition((Token **)&op, &position);
+  
   TEST_ASSERT_EQUAL(1, position);
-  TEST_ASSERT_EQUAL(PREFIX, op->arity);
-  TEST_ASSERT_EQUAL(LEFT_TO_RIGHT, op->assoc);
-  TEST_ASSERT_EQUAL(0, op->precedence);
-  TEST_ASSERT_EQUAL_PTR("(", op->symbol);
+  TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, LEFT_TO_RIGHT, 13, "(", op);
 }
 
 void test_firstPosition_given_Prefix_symbol_operatorToken_should_tryConvertToPrefix_and_second_position(void)
 {
-  OperatorToken *op = malloc(sizeof(OperatorToken));
-  op->type = TOKEN_OPERATOR_TYPE;
-  op->symbol = "+";
+  OperatorToken *op = (OperatorToken*)createOperatorToken("+");
 
   int position = 0;
 
   firstPosition((Token **)&op, &position);
-  TEST_ASSERT_EQUAL(2, position);
-  TEST_ASSERT_EQUAL(PREFIX, op->arity);
-  TEST_ASSERT_EQUAL(RIGHT_TO_LEFT, op->assoc);
-  TEST_ASSERT_EQUAL(12, op->precedence);
-  TEST_ASSERT_EQUAL_PTR("+", op->symbol);
+  
+  TEST_ASSERT_EQUAL_ATTRIBUTE_OPERATOR(PREFIX, RIGHT_TO_LEFT, 12, "+", op);
+  TEST_ASSERT_EQUAL(1, position);
 }
 
 void test_firstPosition_given_a_not_PREFIX_symbol_should_Catch_the_error(void)
 {
-  OperatorToken *op = malloc(sizeof(OperatorToken));
-  op->type = TOKEN_OPERATOR_TYPE;
-  op->symbol = "=";
+  OperatorToken *op = (OperatorToken*)createOperatorToken("=");
 
   int forFun = 0;
   ErrorObject *err;
@@ -199,9 +184,7 @@ void test_firstPosition_given_a_not_PREFIX_symbol_should_Catch_the_error(void)
 
 void test_firstPosition_given_a_IntegerToken_should_give_third_position(void)
 {
-  IntegerToken *value1 = malloc(sizeof(IntegerToken));
-  value1->type = TOKEN_INTEGER_TYPE;
-  value1->value = 1;
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
 
   int position = 0;
 
@@ -212,10 +195,9 @@ void test_firstPosition_given_a_IntegerToken_should_give_third_position(void)
 
 void test_fourthPosition_given_an_INFIX_OPERATOR_token_should_give_correct_position(void)
 {
-  OperatorToken *op = malloc(sizeof(OperatorToken));
-  op->type = TOKEN_OPERATOR_TYPE;
-  op->symbol = "+";
-  op->arity = INFIX;
+  OperatorToken *op = (OperatorToken*)createOperatorToken("+");
+  Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
+  op = (OperatorToken *)attr->extend((Token *)op, attr);
 
   int position = 0;
 
@@ -226,13 +208,12 @@ void test_fourthPosition_given_an_INFIX_OPERATOR_token_should_give_correct_posit
 
 void test_fourthPosition_given_an_PREFIX_OPERATOR_token_should_Catch_the_error(void)
 {
-  ErrorObject *err;
-  OperatorToken *op = malloc(sizeof(OperatorToken));
-  op->type = TOKEN_OPERATOR_TYPE;
-  op->symbol = "!";
-  op->arity = PREFIX;
-
+  OperatorToken *op = (OperatorToken*)createOperatorToken("!");
+  Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
+  op = (OperatorToken *)attr->extend((Token *)op, attr);
+  
   int position = 0;
+  ErrorObject *err;
   Try
   {
     fourthPosition((Token *)op, &position);
@@ -252,33 +233,27 @@ void test_fourthPosition_given_an_PREFIX_OPERATOR_token_should_Catch_the_error(v
 
 void test_thirdPosition_given_a_increment_POSTFIX_symbol_operatorToken_should_give_fourth_position(void)
 {
-  OperatorToken *op = malloc(sizeof(OperatorToken));
-  op->type = TOKEN_OPERATOR_TYPE;
-  op->symbol = "++";
-
+  OperatorToken *op = (OperatorToken*)createOperatorToken("++");
+  
   int position = 0;
 
   thirdPosition((Token *)op, &position);
-  TEST_ASSERT_EQUAL(4, position);
+  TEST_ASSERT_EQUAL(3, position);
 }
 
 void test_thirdPosition_given_a_decrement_POSTFIX_symbol_operatorToken_should_give_fourth_position(void)
 {
-  OperatorToken *op = malloc(sizeof(OperatorToken));
-  op->type = TOKEN_OPERATOR_TYPE;
-  op->symbol = "--";
+  OperatorToken *op = (OperatorToken*)createOperatorToken("--");
 
   int position = 0;
 
   thirdPosition((Token *)op, &position);
-  TEST_ASSERT_EQUAL(4, position);
+  TEST_ASSERT_EQUAL(3, position);
 }
 
 void test_thirdPosition_given_a_closingBracket_POSTFIX_symbol_operatorToken_should_give_third_position(void)
 {
-  OperatorToken *op = malloc(sizeof(OperatorToken));
-  op->type = TOKEN_OPERATOR_TYPE;
-  op->symbol = ")";
+  OperatorToken *op = (OperatorToken*)createOperatorToken(")");
 
   int position = 0;
 
@@ -290,7 +265,7 @@ void test_thirdPosition_given_a_INFIX_symbol_operatorToken_should_give_FIRST_pos
 {
   OperatorToken *op = (OperatorToken*)createOperatorToken("/");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
-  op =(OperatorToken *)attr->extend((Token *)op, attr);
+  op = (OperatorToken *)attr->extend((Token *)op, attr);
   int position = 0;
 
   thirdPosition((Token *)op, &position);
@@ -302,7 +277,7 @@ void test_thirdPosition_given_a_PREFIX_symbol_operatorToken_should_CATCH_the_err
   ErrorObject *err;
   OperatorToken *op = (OperatorToken*)createOperatorToken("!");
   Attributes *attr = &operatorAttributesTable[(int)*(op->symbol)];
-  op =(OperatorToken *)attr->extend((Token *)op, attr);
+  op = (OperatorToken *)attr->extend((Token *)op, attr);
   int position = 0;
 
   Try
@@ -710,13 +685,13 @@ void test_tryPushToOpStack_given_minus_then_compare_precedance_should_reduct(voi
 {
   OperatorToken *op1 = (OperatorToken*)createOperatorToken("+");
   Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
-  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+  op1 = (OperatorToken *)attr->extend((Token *)op1, attr);
 
   List *opStack = stackBuild(1, op1);
 
   OperatorToken *token = (OperatorToken*)createOperatorToken("-");
   attr = &operatorAttributesTable[(int)*(token->symbol)];
-  token =(OperatorToken *)attr->extend((Token *)token, attr);
+  token = (OperatorToken *)attr->extend((Token *)token, attr);
   
   IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
   IntegerToken *value2 = (IntegerToken *)createIntegerToken(2);
@@ -728,15 +703,16 @@ void test_tryPushToOpStack_given_minus_then_compare_precedance_should_reduct(voi
   TEST_ASSERT_EQUAL_TREE(op1, (Token *)value1, (Token *)value2, intStack->head->data);
 }
 
-/*      -
- *      |
- *      2
+/* give: - 1
+ *       -
+ *      /
+ *     1
  */
 void test_shuntingYard_given_minus_one_should_build_in_tree_with_one_node_only(void)
 {
   OperatorToken *op1 = (OperatorToken*)createOperatorToken("-");
   Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
-  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+  op1 = (OperatorToken *)attr->extend((Token *)op1, attr);
   getToken_ExpectAndReturn((Token *)op1);
 
   IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
@@ -744,7 +720,7 @@ void test_shuntingYard_given_minus_one_should_build_in_tree_with_one_node_only(v
 
   OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
   attr = &operatorAttributesTable[(int)*(opEnd->symbol)];
-  opEnd =(OperatorToken *)attr->extend((Token *)opEnd, attr);
+  opEnd = (OperatorToken *)attr->extend((Token *)opEnd, attr);
   getToken_ExpectAndReturn((Token *)opEnd);
 
   Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
@@ -754,7 +730,9 @@ void test_shuntingYard_given_minus_one_should_build_in_tree_with_one_node_only(v
   TEST_ASSERT_EQUAL_ONE_NODE_TREE(op1, (Token *)value1, (OperatorToken *)token);
 }
 
-/*            +
+/* give: ( - 1 ) * 5 + 4 $
+ *
+ *            +
  *           / \
  *          *   4
  *         / \
@@ -766,7 +744,7 @@ void test_shuntingYard_given_one_expression_should_build_tree_in_intStack(void)
 {
   OperatorToken *op1 = (OperatorToken*)createOperatorToken("(");
   Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
-  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+  op1 = (OperatorToken *)attr->extend((Token *)op1, attr);
   getToken_ExpectAndReturn((Token *)op1);
 
   OperatorToken *op2 = (OperatorToken*)createOperatorToken("-");
@@ -811,6 +789,153 @@ void test_shuntingYard_given_one_expression_should_build_tree_in_intStack(void)
   TEST_ASSERT_EQUAL_TREE(op5, (Token *)op4, (Token *)value3, (OperatorToken *)token);
 }
 
+/* give:  - 1 * ( 5 + 4 ) $
+ *
+ *            *
+ *           / \
+ *          -  +
+ *         /  / \
+ *        1  5   4
+ */
+void test_shuntingYard_given_another_expression_should_build_tree_in_intStack(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("-");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 = (OperatorToken *)attr->extend((Token *)op1, attr);
+  getToken_ExpectAndReturn((Token *)op1);
+
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  getToken_ExpectAndReturn((Token *)value1);
+
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("*");
+  attr = &operatorAttributesTable[(int)*(op2->symbol)];
+  op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
+  getToken_ExpectAndReturn((Token *)op2);
+
+  OperatorToken *op3 = (OperatorToken*)createOperatorToken("(");
+  attr = &operatorAttributesTable[(int)*(op3->symbol)];
+  op3 =(OperatorToken *)attr->extend((Token *)op3, attr);
+  getToken_ExpectAndReturn((Token *)op3);
+  
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(5);
+  getToken_ExpectAndReturn((Token *)value2);
+  
+  OperatorToken *op4 = (OperatorToken*)createOperatorToken("+");
+  attr = &operatorAttributesTable[(int)*(op4->symbol)];
+  op4 =(OperatorToken *)attr->extend((Token *)op4, attr);
+  getToken_ExpectAndReturn((Token *)op4);
+  
+  IntegerToken *value3 = (IntegerToken *)createIntegerToken(4);
+  getToken_ExpectAndReturn((Token *)value3);
+  
+  OperatorToken *op5 = (OperatorToken*)createOperatorToken(")");
+  attr = &operatorAttributesTable[(int)*(op5->symbol)];
+  op5 =(OperatorToken *)attr->extend((Token *)op5, attr);
+  getToken_ExpectAndReturn((Token *)op5);
+  
+  OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  attr = &operatorAttributesTable[(int)*(opEnd->symbol)];
+  opEnd =(OperatorToken *)attr->extend((Token *)opEnd, attr);
+  getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  token = shuntingYard();
+  
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op1, (Token *)value1, (OperatorToken *)((OperatorToken *)token)->token[0]);
+  TEST_ASSERT_EQUAL_TREE(op2, (Token *)op1, (Token *)op4, (OperatorToken *)token);
+  TEST_ASSERT_EQUAL_TREE(op4, (Token *)value2, (Token *)value3, (OperatorToken *)((OperatorToken *)token)->token[1]);
+}
+
+/* give:  + 1 * ( ++ 5 -- + 4 -- ) $
+ *
+ *             *
+ *           /  \
+ *          +    +
+ *         /   /  \
+ *        1  ++    --
+ *           /      \
+ *          --       4
+ *         /
+ *        5
+ */
+void test_shuntingYard_given_complex_expression_should_build_tree_in_intStack(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("+");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 = (OperatorToken *)attr->extend((Token *)op1, attr);
+  getToken_ExpectAndReturn((Token *)op1);
+
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  getToken_ExpectAndReturn((Token *)value1);
+
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("*");
+  attr = &operatorAttributesTable[(int)*(op2->symbol)];
+  op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
+  getToken_ExpectAndReturn((Token *)op2);
+
+  OperatorToken *op3 = (OperatorToken*)createOperatorToken("(");
+  attr = &operatorAttributesTable[(int)*(op3->symbol)];
+  op3 =(OperatorToken *)attr->extend((Token *)op3, attr);
+  getToken_ExpectAndReturn((Token *)op3);
+  
+  OperatorToken *op4 = (OperatorToken*)createOperatorToken("++");
+  attr = &operatorAttributesTable[(int)*(op4->symbol)];
+  op4 =(OperatorToken *)attr->extend((Token *)op4, attr);
+  getToken_ExpectAndReturn((Token *)op4);
+  
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(5);
+  getToken_ExpectAndReturn((Token *)value2);
+    
+  OperatorToken *op5 = (OperatorToken*)createOperatorToken("--");
+  attr = &operatorAttributesTable[(int)*(op5->symbol)];
+  op5 =(OperatorToken *)attr->extend((Token *)op5, attr);
+  getToken_ExpectAndReturn((Token *)op5);
+  
+  OperatorToken *op6 = (OperatorToken*)createOperatorToken("+");
+  attr = &operatorAttributesTable[(int)*(op6->symbol)];
+  op6 =(OperatorToken *)attr->extend((Token *)op6, attr);
+  getToken_ExpectAndReturn((Token *)op6);
+  
+  IntegerToken *value3 = (IntegerToken *)createIntegerToken(4);
+  getToken_ExpectAndReturn((Token *)value3);
+
+  OperatorToken *op7 = (OperatorToken*)createOperatorToken("--");
+  attr = &operatorAttributesTable[(int)*(op7->symbol)];
+  op7 =(OperatorToken *)attr->extend((Token *)op7, attr);
+  getToken_ExpectAndReturn((Token *)op7);
+  
+  OperatorToken *op8 = (OperatorToken*)createOperatorToken(")");
+  attr = &operatorAttributesTable[(int)*(op8->symbol)];
+  op8 =(OperatorToken *)attr->extend((Token *)op8, attr);
+  getToken_ExpectAndReturn((Token *)op8);
+  
+  OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  attr = &operatorAttributesTable[(int)*(opEnd->symbol)];
+  opEnd =(OperatorToken *)attr->extend((Token *)opEnd, attr);
+  getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  // ErrorObject *err;
+  // Try
+  // {
+  token = shuntingYard();
+    // TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
+  // }
+  // Catch(err)
+  // {
+    // printf("%s\n",err->errorMsg);
+  // }
+  // printf("arity of op6 = %d\n", op6->arity);
+  // printf("token)->token[1]arity of = %d\n", ((OperatorToken *)((OperatorToken *)token)->token[1])->arity);
+
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op1, (Token *)value1, (OperatorToken *)((OperatorToken *)token)->token[0]);
+  TEST_ASSERT_EQUAL_TREE(op2, (Token *)op1, (Token *)op6, (OperatorToken *)token);
+  TEST_ASSERT_EQUAL_TREE(op6, (Token *)op4, (Token *)op7, (OperatorToken *)((OperatorToken *)token)->token[1]);
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op4, (Token *)op5, (OperatorToken *)((OperatorToken *)((OperatorToken *)token)->token[1])->token[0]);
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op5, (Token *)value2, (OperatorToken *)((OperatorToken *)((OperatorToken *)((OperatorToken *)token)->token[1])->token[0])->token[0]);
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op7, (Token *)value3, (OperatorToken *)((OperatorToken *)((OperatorToken *)token)->token[1])->token[1]);
+}
+
 /*  ( + )
  *     ^ 
  *  error
@@ -819,17 +944,17 @@ void test_shuntingYard_given_expression_without_integer_should_catch_the_error(v
 {
   OperatorToken *op1 = (OperatorToken*)createOperatorToken("(");
   Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
-  op1 =(OperatorToken *)attr->extend((Token *)op1, attr);
+  op1 = (OperatorToken *)attr->extend((Token *)op1, attr);
   getToken_ExpectAndReturn((Token *)op1);
 
   OperatorToken *op2 = (OperatorToken*)createOperatorToken("+");
   attr = &operatorAttributesTable[(int)*(op2->symbol)];
-  op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
+  op2 = (OperatorToken *)attr->extend((Token *)op2, attr);
   getToken_ExpectAndReturn((Token *)op2);
   
   OperatorToken *op3 = (OperatorToken*)createOperatorToken(")");
   attr = &operatorAttributesTable[(int)*(op3->symbol)];
-  op3 =(OperatorToken *)attr->extend((Token *)op3, attr);
+  op3 = (OperatorToken *)attr->extend((Token *)op3, attr);
   getToken_ExpectAndReturn((Token *)op3);
 
   // OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
@@ -847,9 +972,9 @@ void test_shuntingYard_given_expression_without_integer_should_catch_the_error(v
   Catch(err)
   {
     // printf("%s\n",err->errorMsg);
-    TEST_ASSERT_EQUAL_STRING("Hey! There should be an number after operator.", \
+    TEST_ASSERT_EQUAL_STRING("Hey! This symbol is not belong to prefix type.", \
                                err->errorMsg);
-    TEST_ASSERT_EQUAL(NOT_NUMBER_AFTER_OPERATOR, err->errorCode);
+    TEST_ASSERT_EQUAL(FAIL_TO_CONVERT_TO_PREFIX, err->errorCode);
 
     freeError(err);
   }
@@ -873,12 +998,6 @@ void test_shuntingYard_given_expression_with_wrong_prefix_symbol_should_catch_th
   getToken_ExpectAndReturn((Token *)op2);
   
   IntegerToken *value1 = (IntegerToken *)createIntegerToken(5);
-  // getToken_ExpectAndReturn((Token *)value1);
-
-  // OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
-  // attr = &operatorAttributesTable[(int)*(opEnd->symbol)];
-  // opEnd =(OperatorToken *)attr->extend((Token *)opEnd, attr);
-  // getToken_ExpectAndReturn((Token *)opEnd);
 
   Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
   ErrorObject *err;
@@ -890,9 +1009,9 @@ void test_shuntingYard_given_expression_with_wrong_prefix_symbol_should_catch_th
   Catch(err)
   {
     // printf("%s\n",err->errorMsg);
-    TEST_ASSERT_EQUAL_STRING("Hey! There should be an number after operator.", \
+    TEST_ASSERT_EQUAL_STRING("Hey! This symbol is not belong to prefix type.", \
                                err->errorMsg);
-    TEST_ASSERT_EQUAL(NOT_NUMBER_AFTER_OPERATOR, err->errorCode);
+    TEST_ASSERT_EQUAL(FAIL_TO_CONVERT_TO_PREFIX, err->errorCode);
 
     freeError(err);
   }

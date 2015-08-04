@@ -67,11 +67,11 @@ void firstPosition(Token **token, int *whichPosition)
     {
       tryConvertToPrefix((Token ***)&token);
       
-      if((int)*(((OperatorToken *)*token)->symbol) == '('         \
-          && (int)*(((OperatorToken *)*token)->symbol + 1) == 0)
-        *whichPosition = 1;     
-      else
-        *whichPosition = 2;
+      // if((int)*(((OperatorToken *)*token)->symbol) == '('         \
+          // && (int)*(((OperatorToken *)*token)->symbol + 1) == 0)
+      *whichPosition = 1;     
+      // else
+        // *whichPosition = 2;
     }
     else if((*token)->type == TOKEN_INTEGER_TYPE )
     {
@@ -97,20 +97,8 @@ void thirdPosition(Token *token, int *whichPosition)
 {
   if(token->type == TOKEN_OPERATOR_TYPE)
   {
-    if (   (int)*((OperatorToken *)token)->symbol == '+' \
-           && (int)*(((OperatorToken *)token)->symbol + 1) == '+' \
-           && (int)*(((OperatorToken *)token)->symbol + 2) == 0 \
-        || (int)*((OperatorToken *)token)->symbol == '-' \
-           && (int)*(((OperatorToken *)token)->symbol + 1) == '-' \
-           && (int)*(((OperatorToken *)token)->symbol + 2) == 0)
+    if(isPostfixOperator((OperatorToken *)token))
     {
-      // printf("HAHA\n");
-      *whichPosition = 4;
-    }
-    else if((int)*((OperatorToken *)token)->symbol == ')' \
-           && (int)*(((OperatorToken *)token)->symbol + 1) == 0)
-    {
-      // printf("HAHA\n");
       *whichPosition = 3;
     }
     else
@@ -158,17 +146,26 @@ void reductionUntilMetOpenBracket(List *intStack, List *opStack)
 
 int precedenceTokenInOpStackHigher(List *opStack, OperatorToken *token)
 {
+  if((int)*((OperatorToken *)opStack->head->data)->symbol == '(')
+    return 0;
+  
+  if(opStack->head == NULL)
+    return 0;
+  
   if(((OperatorToken *)opStack->head->data)->precedence > token->precedence)
-    return 1;
-  else if(((OperatorToken *)opStack->head->data)->precedence == token->precedence)
+    return 1; 
+    // printf("hello higher\n");
+    
+  if(((OperatorToken *)opStack->head->data)->precedence == token->precedence)
   {
     if(((OperatorToken *)opStack->head->data)->assoc == LEFT_TO_RIGHT)
       return 1;
     else
       return 0;
   }
-  else
-    return 0;
+ 
+  return 0;
+
 }
 
 void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token)
@@ -184,11 +181,30 @@ void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token)
   else
   {
     needReduction = precedenceTokenInOpStackHigher(opStack, token);
-    // printf("need? %d\n", needReduction);
-    if(needReduction)
-      reduction(intStack, opStack);
+    // printf("need? %d\n", precedenceTokenInOpStackHigher(opStack, token));
+
+    // if(needReduction)
+    // {
+      // reduction(intStack, opStack);
+    // }
+    // printf("**opStack->head = %d \n", opStack->head);
     
+    // needReduction = precedenceTokenInOpStackHigher(opStack, token);
+    // printf("need? %d\n", precedenceTokenInOpStackHigher(opStack, token));
+    // while(precedenceTokenInOpStackHigher(opStack, token))
+    while(needReduction)
+    {
+      // printf("YEAH!!!\n");
+      reduction(intStack, opStack);
+      // needReduction = precedenceTokenInOpStackHigher(opStack, token);
+      if(opStack->head == NULL) 
+        needReduction = 0;
+      else
+        needReduction = precedenceTokenInOpStackHigher(opStack, token); 
+    }
+
     stackPush(opStack, token);
+    // printf("after PUSH need opStack->head = %s \n", ((OperatorToken *)opStack->head->data)->symbol);
   }
 }
 
@@ -216,24 +232,32 @@ Token *shuntingYard()
       case 4: fourthPosition(token, &whichPosition); break;
       default: throwError("Hey! Unknown error!", UNKNOWN_ERROR); break;
     }
-    // printf("After posiFunc = %d \n", whichPosition);
     
     if(token->type == TOKEN_OPERATOR_TYPE && opStack->head == NULL)
     {
-      
-      // printf("NULL?\n");
+      // printf("$$$$$NULL head\n");
+      // printf("token->symbol) = %s\n", ((OperatorToken *)token)->symbol);
+      // printf("head)->symbol) = %s\n", ((OperatorToken *)token)->symbol);
       stackPush(opStack, token);
     }
     else if(token->type == TOKEN_OPERATOR_TYPE && opStack->head != NULL)
     {
-      // printf("-minus?\n");
+      // printf("NOT NULL\n");
+      // printf("token->symbol) = %s\n", ((OperatorToken *)token)->symbol);
       tryPushToOpStack(intStack, opStack, (OperatorToken *)token);
+      // printf("*&&*opStack->head = %d \n", opStack->head);
+      // printf("opStack->next %d\n", opStack->head->next);
+      // printf("head)->next->symbol = %s\n", ((OperatorToken *)opStack->head->next->data)->symbol);
     }
     else if(token->type == TOKEN_INTEGER_TYPE)
+    {
+      // printf("INT\n");
       stackPush(intStack, token);
+    }
     else
       throwError("Hey! I cannot handle this kind of Token Type yet!", UNHANDLE_TOKEN_TYPE);
     
+    // printf("After posiFunc = %d \n", whichPosition);
     // printf("opStacl->head->symbol %s\n", ((OperatorToken *)opStack->head->data)->symbol);
     // printf("opStack->next %d\n", opStack->head->next);
     token = _getToken();

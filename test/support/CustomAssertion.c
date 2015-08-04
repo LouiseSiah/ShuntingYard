@@ -14,7 +14,14 @@ void customTestAssertTree(OperatorToken *expectedOp, Token* token0, Token* token
   }
   else if(token0->type == TOKEN_OPERATOR_TYPE)
   {
-    customTestAssertOperator((OperatorToken *)token0, (OperatorToken *)actualOp->token[0], lineNumber);
+    if((int) *((OperatorToken *)token0)->symbol != (int) *((OperatorToken *)actualOp->token[0])->symbol)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[0] symbol was '%s' but actual was '%s'.", ((OperatorToken *)token0)->symbol, ((OperatorToken *)actualOp->token[0])->symbol);
+    if(((OperatorToken *)token0)->arity != ((OperatorToken *)actualOp->token[0])->arity)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[0] arity was %d but actual %d.", ((OperatorToken *)token0)->arity, ((OperatorToken *)actualOp->token[0])->arity);
+    if(((OperatorToken *)token0)->precedence != ((OperatorToken *)actualOp->token[0])->precedence)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[0] precedence was %d but actual %d.", ((OperatorToken *)token0)->precedence, ((OperatorToken *)actualOp->token[0])->precedence);
+    if(((OperatorToken *)token0)->assoc != ((OperatorToken *)actualOp->token[0])->assoc)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[0] associativity was %d but actual %d.", ((OperatorToken *)token0)->assoc, ((OperatorToken *)actualOp->token[0])->assoc);
   }
   else
   {
@@ -28,7 +35,14 @@ void customTestAssertTree(OperatorToken *expectedOp, Token* token0, Token* token
   }
   else if(token1->type == TOKEN_OPERATOR_TYPE)
   {
-    customTestAssertOperator((OperatorToken *)token1, (OperatorToken *)actualOp->token[1], lineNumber);
+    if((int) *((OperatorToken *)token1)->symbol != (int) *((OperatorToken *)actualOp->token[1])->symbol)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[1] symbol was '%s' but actual was '%s'.", ((OperatorToken *)token1)->symbol, ((OperatorToken *)actualOp->token[1])->symbol);
+    if(((OperatorToken *)token1)->arity != ((OperatorToken *)actualOp->token[1])->arity)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[1] arity was %d but actual %d.", ((OperatorToken *)token1)->arity, ((OperatorToken *)actualOp->token[1])->arity);
+    if(((OperatorToken *)token1)->precedence != ((OperatorToken *)actualOp->token[1])->precedence)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[1] precedence was %d but actual %d.", ((OperatorToken *)token1)->precedence, ((OperatorToken *)actualOp->token[1])->precedence);
+    if(((OperatorToken *)token1)->assoc != ((OperatorToken *)actualOp->token[1])->assoc)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[1] associativity was %d but actual %d.", ((OperatorToken *)token1)->assoc, ((OperatorToken *)actualOp->token[1])->assoc);
   }
   else
   {
@@ -48,7 +62,14 @@ void customTestAssertPrefixPostfixTree(OperatorToken *expectedOp, Token* token0,
   }
   else if(token0->type == TOKEN_OPERATOR_TYPE)
   {
-    customTestAssertOperator((OperatorToken *)token0, (OperatorToken *)actualOp->token[0], lineNumber);
+    if((int) *((OperatorToken *)token0)->symbol != (int) *((OperatorToken *)actualOp->token[0])->symbol)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[0] symbol was '%s' but actual was '%s'.", ((OperatorToken *)token0)->symbol, ((OperatorToken *)actualOp->token[0])->symbol);
+    if(((OperatorToken *)token0)->arity != ((OperatorToken *)actualOp->token[0])->arity)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[0] arity was %d but actual %d.", ((OperatorToken *)token0)->arity, ((OperatorToken *)actualOp->token[0])->arity);
+    if(((OperatorToken *)token0)->precedence != ((OperatorToken *)actualOp->token[0])->precedence)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[0] precedence was %d but actual %d.", ((OperatorToken *)token0)->precedence, ((OperatorToken *)actualOp->token[0])->precedence);
+    if(((OperatorToken *)token0)->assoc != ((OperatorToken *)actualOp->token[0])->assoc)
+      CUSTOM_TEST_FAIL(lineNumber,"Expected token[0] associativity was %d but actual %d.", ((OperatorToken *)token0)->assoc, ((OperatorToken *)actualOp->token[0])->assoc);
   }
   else
   {
