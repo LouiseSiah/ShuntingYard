@@ -730,6 +730,145 @@ void test_shuntingYard_given_minus_one_should_build_in_tree_with_one_node_only(v
   TEST_ASSERT_EQUAL_ONE_NODE_TREE(op1, (Token *)value1, (OperatorToken *)token);
 }
 
+/* give: -- ++ 1
+ *
+ *            --
+ *           / 
+ *          ++ 
+ *         / 
+ *        1
+ */
+void test_shuntingYard_given_decrement_increment_one_should_build_in_tree_follow_the_pattern(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("--");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 = (OperatorToken *)attr->extend((Token *)op1, attr);
+  getToken_ExpectAndReturn((Token *)op1);
+
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("++");
+  attr = &operatorAttributesTable[(int)*(op2->symbol)];
+  op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
+  getToken_ExpectAndReturn((Token *)op2);
+  
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  getToken_ExpectAndReturn((Token *)value1);
+
+  OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  attr = &operatorAttributesTable[(int)*(opEnd->symbol)];
+  opEnd =(OperatorToken *)attr->extend((Token *)opEnd, attr);
+  getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  token = shuntingYard();
+  
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op1, (Token *)op2, (OperatorToken *)token);
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op2, (Token *)value1, (OperatorToken *)((OperatorToken *)token)->token[0]);
+}
+
+/* give: 1 ++ --
+ *
+ *            --
+ *           / 
+ *          ++ 
+ *         / 
+ *        1
+ */
+void test_shuntingYard_given_one_decrement_increment_should_build_in_tree_follow_the_pattern(void)
+{
+    
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  getToken_ExpectAndReturn((Token *)value1);
+  
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("++");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 = (OperatorToken *)attr->extend((Token *)op1, attr);
+  getToken_ExpectAndReturn((Token *)op1);
+
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("--");
+  attr = &operatorAttributesTable[(int)*(op2->symbol)];
+  op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
+  getToken_ExpectAndReturn((Token *)op2);
+
+  OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  attr = &operatorAttributesTable[(int)*(opEnd->symbol)];
+  opEnd =(OperatorToken *)attr->extend((Token *)opEnd, attr);
+  getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  token = shuntingYard();
+  
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op2, (Token *)op1, (OperatorToken *)token);
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op1, (Token *)value1, (OperatorToken *)((OperatorToken *)token)->token[0]);
+}
+
+/* give: -- ( -- 1 ++ ) ++
+ *       o1 o2 o3 o4 o5 o6
+ *                  -- <---o1
+ *                 / 
+ *               ++    <---o6
+ *              / 
+ *            --       <---o3
+ *           / 
+ *          ++         <---o4
+ *         / 
+ *        1
+ */
+void test_shuntingYard_given_multi_Prefix_and_Postfix_expression_should_build_in_tree_follow_the_pattern(void)
+{
+ 
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("--");
+  Attributes *attr = &operatorAttributesTable[(int)*(op1->symbol)];
+  op1 = (OperatorToken *)attr->extend((Token *)op1, attr);
+  getToken_ExpectAndReturn((Token *)op1);
+
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("(");
+  attr = &operatorAttributesTable[(int)*(op2->symbol)];
+  op2 =(OperatorToken *)attr->extend((Token *)op2, attr);
+  getToken_ExpectAndReturn((Token *)op2);
+  
+  OperatorToken *op3 = (OperatorToken*)createOperatorToken("--");
+  attr = &operatorAttributesTable[(int)*(op3->symbol)];
+  op3 =(OperatorToken *)attr->extend((Token *)op3, attr);
+  getToken_ExpectAndReturn((Token *)op3);
+  
+
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(1);
+  getToken_ExpectAndReturn((Token *)value1);
+  
+  OperatorToken *op4 = (OperatorToken*)createOperatorToken("++");
+  attr = &operatorAttributesTable[(int)*(op4->symbol)];
+  op4 =(OperatorToken *)attr->extend((Token *)op4, attr);
+  getToken_ExpectAndReturn((Token *)op4);
+    
+  OperatorToken *op5 = (OperatorToken*)createOperatorToken(")");
+  attr = &operatorAttributesTable[(int)*(op5->symbol)];
+  op5 =(OperatorToken *)attr->extend((Token *)op5, attr);
+  getToken_ExpectAndReturn((Token *)op5);
+  
+  OperatorToken *op6 = (OperatorToken*)createOperatorToken("++");
+  attr = &operatorAttributesTable[(int)*(op6->symbol)];
+  op6 =(OperatorToken *)attr->extend((Token *)op6, attr);
+  getToken_ExpectAndReturn((Token *)op6);
+
+  OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  attr = &operatorAttributesTable[(int)*(opEnd->symbol)];
+  opEnd =(OperatorToken *)attr->extend((Token *)opEnd, attr);
+  getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  token = shuntingYard();
+  
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op1, (Token *)op6, (OperatorToken *)token);
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op6, (Token *)op3, (OperatorToken *)((OperatorToken *)    \
+  token)->token[0]);
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op3, (Token *)op4, (OperatorToken *)((OperatorToken *)    \
+  ((OperatorToken *)token)->token[0])->token[0]);
+  TEST_ASSERT_EQUAL_ONE_NODE_TREE(op4, (Token *)value1, (OperatorToken *)((OperatorToken *) \
+  ((OperatorToken *)((OperatorToken *)token)->token[0])->token[0])->token[0]);
+  TEST_ASSERT_EQUAL(value1->value, ((IntegerToken *)((OperatorToken *)((OperatorToken *)    \
+  ((OperatorToken *)((OperatorToken *)token)->token[0])->token[0])->token[0])->token[0])->value);
+}
+
 /* give: ( - 1 ) * 5 + 4 $
  *
  *            +
