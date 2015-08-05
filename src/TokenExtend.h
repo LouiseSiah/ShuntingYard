@@ -5,7 +5,8 @@
 #include "CException.h"
 
 typedef struct Attributes_t Attributes;
-struct Attributes_t{
+struct Attributes_t
+{
  	Arity arity;
   Associativity assoc;
   uint32_t precedence;

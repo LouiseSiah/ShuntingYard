@@ -48,65 +48,94 @@ void reduction(List *intStack, List *opStack)
   //return (Token *)op;
 }
 
-void secondPosition(Token *token, int *whichPosition)
-{
-  // printf("+second pos token type = %d\n", ((IntegerToken *)token)->type);
-  // printf("INT  TYPE = %d\n", TOKEN_INTEGER_TYPE);
-  if(token->type == TOKEN_INTEGER_TYPE )
-    *whichPosition = 3;
-  else
-    throwError("Hey! There should be an number after operator.",  \
-              NOT_NUMBER_AFTER_OPERATOR);
-}
-
-void firstPosition(Token **token, int *whichPosition)
+/* This function is to indicate that the START of an expression or the
+ *   position after INFIX operator must use either Prefix operator or integer number.
+ * It will throw an Error: NEITHER_PREFIX_NOR_NUMBER,
+ *  when the input neither PREFIX operator nor number.
+ *
+ * E.g. : + 1 * 5
+ *        ^
+ *     PREFIX
+ *       when a prefix symbol taken, this function will be called for next token again
+ *  --> + 1 * 5
+ *        ^
+ *       Integer
+ *         when an integer taken, function possibleForPostfixAndInfix() will be called for the next token.
+ *
+ * E.g. 2 : * 1 + 5
+ *          ^
+ *    NOT PREFIX
+ *        Error NEITHER_PREFIX_NOR_NUMBER will be thrown.
+ */
+void possibleForPrefixAndInteger(Token **token, int *whichPosition)
 {
   // printf("token symbol = %s\n", ((OperatorToken *)*token)->symbol);
   // printf("token type= %d\n", ((OperatorToken *)*token)->type);
-    if((*token)->type == TOKEN_OPERATOR_TYPE)
-    {
-      tryConvertToPrefix((Token ***)&token);
-      
-      // if((int)*(((OperatorToken *)*token)->symbol) == '('         \
-          // && (int)*(((OperatorToken *)*token)->symbol + 1) == 0)
-      *whichPosition = 1;     
-      // else
-        // *whichPosition = 2;
-    }
-    else if((*token)->type == TOKEN_INTEGER_TYPE )
-    {
-      secondPosition(*token, whichPosition);
-    }
-    else
-    {
-      throwError("Hey! Expect expression start with an operator or a number.",  \
-                NEITHER_OPERATOR_NOR_NUMBER);
-    }
+  if((*token)->type == TOKEN_OPERATOR_TYPE)
+  {
+    tryConvertToPrefix((Token ***)&token);
 
-}
-
-void fourthPosition(Token *token, int *whichPosition)
-{
-  if(token->type == TOKEN_OPERATOR_TYPE && ((OperatorToken *)token)->arity == INFIX)
+    // if((int)*(((OperatorToken *)*token)->symbol) == '('         \
+        // && (int)*(((OperatorToken *)*token)->symbol + 1) == 0)
     *whichPosition = 1;
+    // else
+      // *whichPosition = 2;
+  }
+  else if((*token)->type == TOKEN_INTEGER_TYPE )
+  {
+    // if(token->type == TOKEN_INTEGER_TYPE )
+      *whichPosition = 2;
+    // else
+      // throwError("Hey! There should be an number after operator.",  \
+              // NOT_NUMBER_AFTER_OPERATOR);
+  }
   else
-    throwError("Hey! Expected an INFIX operator was not.", NOT_INFIX_OPERATOR);
+  {
+    throwError("Hey! Expect expression start with an operator or a number.",  \
+              NEITHER_PREFIX_NOR_NUMBER);
+  }
+
 }
 
-void thirdPosition(Token *token, int *whichPosition)
+/* This function is to indicate that the position after Integer must use either
+ *  POSTFIX or INFIX operator.
+ * It will throw an Error: NEITHER_POSTFIX_NOR_INFIX,
+ *  when the input neither POSTFIX nor INFIX operator.
+ *
+ * E.g. 1: + 1 * 5
+ *            ^
+ *        INFIX
+ *     when a INFIX symbol taken, function possibleForPrefixAndInteger() will be called for next token again
+ *
+ * E.g. 2: 1 ++ * 5
+ *           ^
+ *       POSTFIX
+ *    when a POSTFIX symbol taken, this function will be called for the next token.
+ *
+ * E.g. 3 : 1 ! + 5
+ *            ^
+ *    NOT POSTFIX
+ *        Error NEITHER_POSTFIX_NOR_INFIX will be thrown.
+ *
+ * E.g. 4 : 1 2 + 5
+ *            ^
+ *    NOT OPERATOR
+ *        Error NOT_OPERATOR_AFTER_NUMBER will be thrown.
+ */
+void possibleForPostfixAndInfix(Token *token, int *whichPosition)
 {
   if(token->type == TOKEN_OPERATOR_TYPE)
   {
     if(isPostfixOperator((OperatorToken *)token))
     {
-      *whichPosition = 3;
+      *whichPosition = 2;
     }
     else
     {
       if(((OperatorToken *)token)->arity == INFIX)
-        fourthPosition(token, whichPosition);
+        *whichPosition = 1;
       else
-        throwError("Hey! Expected either POSTFIX or INFIX operator was not.", NOT_POSTFIX_INFIX_OPERATOR);
+        throwError("Hey! Expected either POSTFIX or INFIX operator was not.", NEITHER_POSTFIX_NOR_INFIX);
     }
   }
   else
@@ -128,8 +157,8 @@ void checkOpenBracketInStack(List *operatorStack)
   {
     // printf("head)->symbol) = %s\n", ((OperatorToken *)head->data)->symbol);
     head = head->next;
-    
-  }  
+
+  }
 
   if((int) *((OperatorToken *)head->data)->symbol != '(' && head->next == NULL)
     throwError("Hey! The bracket cannot be paired.", CANNOT_PAIR_THE_BRACKET);
@@ -139,7 +168,7 @@ void reductionUntilMetOpenBracket(List *intStack, List *opStack)
 {
   while((int)*((OperatorToken *)opStack->head->data)->symbol != '(')
     reduction(intStack, opStack);
-  
+
   if((int)*((OperatorToken *)opStack->head->data)->symbol == '(')
     stackRemove(opStack);
 }
@@ -148,14 +177,14 @@ int precedenceTokenInOpStackHigher(List *opStack, OperatorToken *token)
 {
   if((int)*((OperatorToken *)opStack->head->data)->symbol == '(')
     return 0;
-  
+
   if(opStack->head == NULL)
     return 0;
-  
+
   if(((OperatorToken *)opStack->head->data)->precedence > token->precedence)
-    return 1; 
+    return 1;
     // printf("hello higher\n");
-    
+
   if(((OperatorToken *)opStack->head->data)->precedence == token->precedence)
   {
     if(((OperatorToken *)opStack->head->data)->assoc == LEFT_TO_RIGHT)
@@ -163,7 +192,7 @@ int precedenceTokenInOpStackHigher(List *opStack, OperatorToken *token)
     else
       return 0;
   }
- 
+
   return 0;
 
 }
@@ -188,7 +217,7 @@ void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token)
       // reduction(intStack, opStack);
     // }
     // printf("**opStack->head = %d \n", opStack->head);
-    
+
     // needReduction = precedenceTokenInOpStackHigher(opStack, token);
     // printf("need? %d\n", precedenceTokenInOpStackHigher(opStack, token));
     // while(precedenceTokenInOpStackHigher(opStack, token))
@@ -197,10 +226,10 @@ void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token)
       // printf("YEAH!!!\n");
       reduction(intStack, opStack);
       // needReduction = precedenceTokenInOpStackHigher(opStack, token);
-      if(opStack->head == NULL) 
+      if(opStack->head == NULL)
         needReduction = 0;
       else
-        needReduction = precedenceTokenInOpStackHigher(opStack, token); 
+        needReduction = precedenceTokenInOpStackHigher(opStack, token);
     }
 
     stackPush(opStack, token);
@@ -226,13 +255,13 @@ Token *shuntingYard()
 
     switch(whichPosition)
     {
-      case 1: firstPosition(&token, &whichPosition); break;
-      case 2: secondPosition(token, &whichPosition); break;
-      case 3: thirdPosition(token, &whichPosition); break;
-      case 4: fourthPosition(token, &whichPosition); break;
+      case 1: possibleForPrefixAndInteger(&token, &whichPosition); break;
+      // case 2: secondPosition(token, &whichPosition); break;
+      case 2: possibleForPostfixAndInfix(token, &whichPosition); break;
+      // case 4: fourthPosition(token, &whichPosition); break;
       default: throwError("Hey! Unknown error!", UNKNOWN_ERROR); break;
     }
-    
+
     if(token->type == TOKEN_OPERATOR_TYPE && opStack->head == NULL)
     {
       // printf("$$$$$NULL head\n");
@@ -256,7 +285,7 @@ Token *shuntingYard()
     }
     else
       throwError("Hey! I cannot handle this kind of Token Type yet!", UNHANDLE_TOKEN_TYPE);
-    
+
     // printf("After posiFunc = %d \n", whichPosition);
     // printf("opStacl->head->symbol %s\n", ((OperatorToken *)opStack->head->data)->symbol);
     // printf("opStack->next %d\n", opStack->head->next);
@@ -265,11 +294,11 @@ Token *shuntingYard()
 
   while(opStack->head != NULL)
     reduction(intStack, opStack);
-  
+
   if(opStack->head != NULL)
     throwError("Hey! Unknown error!", UNKNOWN_ERROR);
   if(intStack-> head != intStack->tail)
     throwError("Hey! Unknown error!", UNKNOWN_ERROR);
-    
+
   return (intStack->head->data);
 }

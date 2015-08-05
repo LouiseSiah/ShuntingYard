@@ -175,7 +175,7 @@ Token* extendQuadrupleCharacterOperator(Token *op, Attributes *attr)
 
 Token* errorCharactorOperator(Token *op, Attributes *attr)
 {
-    throwError(("%s is an undefined operator.", ((OperatorToken *)op)->symbol), UNDEFINED_OPERATOR);
+  throwError(("%s is an undefined operator.", ((OperatorToken *)op)->symbol), UNDEFINED_OPERATOR);
 }
 
 /* This function is to assign attributes for the operator type token,
