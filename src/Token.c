@@ -42,8 +42,6 @@
  *  ptr in the diagram means pointer which store an address of a Token
  *
  */
-
-
 Token *createOperatorToken(char *symbol)
 {  
   OperatorToken *op = malloc(sizeof(OperatorToken)+ sizeof(Token *) * 2);

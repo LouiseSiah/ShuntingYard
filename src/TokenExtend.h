@@ -22,6 +22,5 @@ Token* errorCharactorOperator(Token *op, Attributes *attr);
 Token *_getToken(); //assign attributes of token
 
 void tryConvertToPrefix(Token ***token);
-int isPostfixOperator(OperatorToken *token);
 
 #endif // TokenExtend_H

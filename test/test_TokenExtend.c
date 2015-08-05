@@ -610,39 +610,3 @@ void test_tryConvertToPrefix_given_greater_symbol_should_fail_to_convert_to_pref
     freeError(err);
   }
 }
-
-/* "*" given, call the function and will get a '0'.
- */
-void test_isPostfixOperator_given_multiply_should_return_Zero(void)
-{
-  OperatorToken *op = (OperatorToken*)createOperatorToken("(");
-  
-  TEST_ASSERT_EQUAL(0, isPostfixOperator(op));
-}
-
-/* "-" given, call the function and will get a '0'.
- */
-void test_isPostfixOperator_given_minus_should_return_Zero(void)
-{
-  OperatorToken *op = (OperatorToken*)createOperatorToken("-");
-  
-  TEST_ASSERT_EQUAL(0, isPostfixOperator(op));
-}
-
-/* "++" given, call the function and will get a '1'.
- */
-void test_isPostfixOperator_given_post_increment_should_return_One(void)
-{
-  OperatorToken *op = (OperatorToken*)createOperatorToken("++");
-  
-  TEST_ASSERT_EQUAL(1, isPostfixOperator(op));
-}
-
-/* ")" given, call the function and will get a '1'.
- */
-void test_isPostfixOperator_given_closingBracket_should_return_One(void)
-{
-  OperatorToken *op = (OperatorToken*)createOperatorToken(")");
-  
-  TEST_ASSERT_EQUAL(1, isPostfixOperator(op));
-}

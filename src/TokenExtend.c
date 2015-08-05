@@ -8,39 +8,39 @@
 /* Table of attributes about the expression operators
  */
 Attributes operatorAttributesTable[] = {
-  ['('] = 		    {PREFIX, LEFT_TO_RIGHT, 13, extendSingleCharacterOperator},
-  ['+'] = 		    {INFIX,  LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
-  ['-'] = 		    {INFIX,  LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
-  ['!'] = 		    {PREFIX, RIGHT_TO_LEFT, 12, extendDoubleCharacterOperator},
-  ['~'] = 		    {PREFIX, RIGHT_TO_LEFT, 12, extendQuadrupleCharacterOperator},
-  ['*'] = 		    {INFIX,  LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
-  ['/'] = 		    {INFIX,  LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
-  ['%'] = 		    {INFIX,  LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
-  ['<'] = 		    {INFIX,	 LEFT_TO_RIGHT,  8, extendQuadrupleCharacterOperator},
-  ['>'] = 		    {INFIX,	 LEFT_TO_RIGHT,  8, extendQuadrupleCharacterOperator},
-  ['='] = 		    {INFIX,	 RIGHT_TO_LEFT,  1, extendDoubleCharacterOperator},
-  ['&'] = 		    {INFIX,	 LEFT_TO_RIGHT,  6, extendTripleCharacterOperator},
-  ['^'] = 		    {INFIX,	 LEFT_TO_RIGHT,  5, extendDoubleCharacterOperator},
-  ['|'] = 		    {INFIX,	 LEFT_TO_RIGHT,  4, extendTripleCharacterOperator},
-  ['a' ... 'z'] = {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  ['A' ... 'Z'] = {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  [48  ...  57] = {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  [')'] = 		    {NOFIX,	 NONE,           0, extendSingleCharacterOperator},
-  ['['] = 		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  [']'] = 		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  ['$'] = 		    {NOFIX,	 NONE,           0, extendSingleCharacterOperator},
-  ['#'] = 		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  ['{'] = 		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  ['}'] =		      {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  ['@'] = 		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  ['?'] =		      {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  ['.'] = 	 	    {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  [','] =		      {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  [';'] =	 	      {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  ['"'] =  		    {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  ['\'']=         {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  ['`'] =		      {NOFIX,	 NONE,          -1, errorCharactorOperator},
-  ['\\']= 	  	  {NOFIX,	 NONE,          -1, errorCharactorOperator},
+  ['('] = 		    {PREFIX,  LEFT_TO_RIGHT, 13, extendSingleCharacterOperator},
+  ['+'] = 		    {INFIX,   LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
+  ['-'] = 		    {INFIX,   LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
+  ['!'] = 		    {PREFIX,  RIGHT_TO_LEFT, 12, extendDoubleCharacterOperator},
+  ['~'] = 		    {PREFIX,  RIGHT_TO_LEFT, 12, extendQuadrupleCharacterOperator},
+  ['*'] = 		    {INFIX,   LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
+  ['/'] = 		    {INFIX,   LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
+  ['%'] = 		    {INFIX,   LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
+  ['<'] = 		    {INFIX,	  LEFT_TO_RIGHT,  8, extendQuadrupleCharacterOperator},
+  ['>'] = 		    {INFIX,	  LEFT_TO_RIGHT,  8, extendQuadrupleCharacterOperator},
+  ['='] = 		    {INFIX,	  RIGHT_TO_LEFT,  1, extendDoubleCharacterOperator},
+  ['&'] = 		    {INFIX,	  LEFT_TO_RIGHT,  6, extendTripleCharacterOperator},
+  ['^'] = 		    {INFIX,	  LEFT_TO_RIGHT,  5, extendDoubleCharacterOperator},
+  ['|'] = 		    {INFIX,	  LEFT_TO_RIGHT,  4, extendTripleCharacterOperator},
+  ['a' ... 'z'] = {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['A' ... 'Z'] = {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  [48  ...  57] = {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  [')'] = 		    {POSTFIX, NONE,           0, extendSingleCharacterOperator},
+  ['['] = 		    {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  [']'] = 		    {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['$'] = 		    {NOFIX,	  NONE,           0, extendSingleCharacterOperator},
+  ['#'] = 		    {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['{'] = 		    {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['}'] =		      {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['@'] = 		    {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['?'] =		      {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['.'] = 	 	    {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  [','] =		      {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  [';'] =	 	      {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['"'] =  		    {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['\'']=         {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['`'] =		      {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['\\']= 	  	  {NOFIX,	  NONE,          -1, errorCharactorOperator},
 };
 
 /* Function for the operator that had only one possibility.
@@ -109,7 +109,7 @@ Token* extendTripleCharacterOperator(Token *op, Attributes *attr)
   }
   else if((int)*(((OperatorToken *)op)->symbol+1) == (int)*((OperatorToken *)op)->symbol \
           && (int)*(((OperatorToken *)op)->symbol+2) == 0)
-  {    
+  {
     if((int)*((OperatorToken *)op)->symbol == '&')
     {
       ((OperatorToken *)op)->arity = INFIX;
@@ -131,7 +131,7 @@ Token* extendTripleCharacterOperator(Token *op, Attributes *attr)
   }
   else if((int)*(((OperatorToken *)op)->symbol+1) == '=' \
         && (int)*(((OperatorToken *)op)->symbol+2) == 0)
-  {    
+  {
     ((OperatorToken *)op)->arity = INFIX;
     ((OperatorToken *)op)->assoc = RIGHT_TO_LEFT;
     ((OperatorToken *)op)->precedence = 1;
@@ -181,27 +181,27 @@ Token* errorCharactorOperator(Token *op, Attributes *attr)
 /* This function is to assign attributes for the operator type token,
  *  it do nothing for other type of token.
  */
-Token *_getToken()  
+Token *_getToken()
 {
   Token *token = getToken();
   if(token->type == TOKEN_OPERATOR_TYPE)
-  { 
+  {
     Attributes *attr = &operatorAttributesTable[(int)*((OperatorToken *)token)->symbol];
     token = attr->extend(token, attr);
     return token;
   }
-  else 
+  else
     return token;
 }
 
 /* This function is try to convert operator from Infix type to Prefix type,
  *  it will throw an error whenever the operator is not belong to Prefix type.
  *  E.g. : 1. '+' will convert to Prefix type successfully.
- *         2. '<' will fail to convert to Prefix type.
+ *         2. '<' will fail to convert to Prefix type then throw an Error FAIL_TO_CONVERT_TO_PREFIX.
  */
 void tryConvertToPrefix(Token ***token)
 {
-  if ( (int) *((OperatorToken *)**token)->symbol == '+' \
+  if( (int) *((OperatorToken *)**token)->symbol == '+' \
        && (int) *(((OperatorToken *)**token)->symbol + 1) == 0)
   {
     ((OperatorToken *)**token)->arity = PREFIX;
@@ -209,7 +209,7 @@ void tryConvertToPrefix(Token ***token)
     ((OperatorToken *)**token)->assoc = RIGHT_TO_LEFT;
   }
 
-  else if ( (int) *((OperatorToken *)**token)->symbol == '+' \
+  else if( (int) *((OperatorToken *)**token)->symbol == '+' \
            && (int) *(((OperatorToken *)**token)->symbol + 1) == '+' \
            && (int) *(((OperatorToken *)**token)->symbol + 2) == 0)
   {
@@ -264,22 +264,3 @@ void tryConvertToPrefix(Token ***token)
                 FAIL_TO_CONVERT_TO_PREFIX);
 }
 
-/* This function is to check is the operator belong to postfix type or not,
- *  if yes will return 1, 
- *  else return 0.
- * Postfix symbol: "--", "++", ")"
- */
-int isPostfixOperator(OperatorToken *token)
-{
-  if( (int)*((OperatorToken *)token)->symbol == '+' \
-           && (int)*(((OperatorToken *)token)->symbol + 1) == '+' \
-           && (int)*(((OperatorToken *)token)->symbol + 2) == 0 \
-     || (int)*((OperatorToken *)token)->symbol == '-' \
-           && (int)*(((OperatorToken *)token)->symbol + 1) == '-' \
-           && (int)*(((OperatorToken *)token)->symbol + 2) == 0
-     || (int)*((OperatorToken *)token)->symbol == ')' \
-           && (int)*(((OperatorToken *)token)->symbol + 1) == 0)
-    return 1;
-  else
-    return 0;      
-}

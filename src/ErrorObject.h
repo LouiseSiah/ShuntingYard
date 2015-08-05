@@ -20,7 +20,6 @@ typedef struct
   char *errorMsg;
   ErrorCode errorCode;
 } ErrorObject;
-  
 
 void throwError(char *message, ErrorCode errCode);
 void freeError(ErrorObject *errObj);

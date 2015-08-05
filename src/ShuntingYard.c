@@ -6,46 +6,42 @@
 #include "CException.h"
 #include "StringTokenizer.h"
 
+/* This function is to build tree in a token by popping the tokens 
+ *  in operator Stack and integer Stack, then push the tree which is in Token *type
+ *   to the integer Stack.
+ *
+ * case 1: When an INFIX operator is given in the head of opStack, then this function
+ *         will pop the opStack ONCE, then pop the intStack TWICE, 
+ *        using the tokens build a tree which is in Token * type.
+ *        The node will then push to intStack.
+ *
+ * case 2: When a PREFIX or POSTFIX operator given, it will pop opStack ONCE, and 
+ *          pop the intStack ONCE. The rest of the steps will same as case 1.
+ */
 void reduction(List *intStack, List *opStack)
 {
   OperatorToken *op = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
   op = (OperatorToken *)stackPop(opStack);
 
-  // printf("op->Token[0] = %d\n", ((IntegerToken *)op->token[0])->value);
-
   if(op->arity == INFIX)
   {
-    // printf("INFIX TREE\n");
     OperatorToken *rightTK= malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
     OperatorToken *leftTK = malloc (sizeof(OperatorToken) + sizeof(Token *) * 2);
 
     rightTK = (OperatorToken *)stackPop(intStack);
     leftTK = (OperatorToken *)stackPop(intStack);
-    // printf("rightTK = %d\n", ((IntegerToken *)rightTK)->value);
-    // printf("leftTK = %d\n", ((IntegerToken *)leftTK)->value);
     op->token[0] = (Token *) leftTK;
     op->token[1] = (Token *) rightTK;
-    // printf("tail before end if = %d\n", intStack->tail);
-    // printf("op->Token[0] = %d\n", ((IntegerToken *)op->token[0])->value);
-    // printf("op->Token[1] = %d\n", ((IntegerToken *)op->token[1])->value);
   }
-
   else
   {
-    // printf("PREFIX TREE\n");
     OperatorToken *leftTK = malloc (sizeof(OperatorToken) + sizeof(Token *));
     leftTK = (OperatorToken *)stackPop(intStack);
 
     op->token[0] = (Token *) leftTK;
   }
 
-  // printf("tail before push  = %d\n", intStack->tail);
   stackPush(intStack, op);
-  // printf("tail = %d\n", intStack->tail);
-  // printf("op symbol = %s\n", op->symbol);
-  // printf("==head->symbol = %d\n", ((OperatorToken *)intStack->head->data)->symbol);
-  // printf("==tail->symbol = %d\n", ((OperatorToken *)intStack->tail->data)->symbol);
-  //return (Token *)op;
 }
 
 /* This function is to indicate that the START of an expression or the
@@ -69,32 +65,16 @@ void reduction(List *intStack, List *opStack)
  */
 void possibleForPrefixAndInteger(Token **token, int *whichPosition)
 {
-  // printf("token symbol = %s\n", ((OperatorToken *)*token)->symbol);
-  // printf("token type= %d\n", ((OperatorToken *)*token)->type);
   if((*token)->type == TOKEN_OPERATOR_TYPE)
   {
     tryConvertToPrefix((Token ***)&token);
 
-    // if((int)*(((OperatorToken *)*token)->symbol) == '('         \
-        // && (int)*(((OperatorToken *)*token)->symbol + 1) == 0)
     *whichPosition = 1;
-    // else
-      // *whichPosition = 2;
   }
   else if((*token)->type == TOKEN_INTEGER_TYPE )
-  {
-    // if(token->type == TOKEN_INTEGER_TYPE )
       *whichPosition = 2;
-    // else
-      // throwError("Hey! There should be an number after operator.",  \
-              // NOT_NUMBER_AFTER_OPERATOR);
-  }
   else
-  {
-    throwError("Hey! Expect expression start with an operator or a number.",  \
-              NEITHER_PREFIX_NOR_NUMBER);
-  }
-
+    throwError("Hey! Expect expression start with an operator or a number.", NEITHER_PREFIX_NOR_NUMBER);
 }
 
 /* This function is to indicate that the position after Integer must use either
@@ -126,7 +106,7 @@ void possibleForPostfixAndInfix(Token *token, int *whichPosition)
 {
   if(token->type == TOKEN_OPERATOR_TYPE)
   {
-    if(isPostfixOperator((OperatorToken *)token))
+    if(((OperatorToken *)token)->arity == POSTFIX)
     {
       *whichPosition = 2;
     }
@@ -142,28 +122,40 @@ void possibleForPostfixAndInfix(Token *token, int *whichPosition)
     throwError("Hey! Expected an operator was not.", NOT_OPERATOR_AFTER_NUMBER);
 }
 
+/* This function is to pair the Brackets (),
+ *  is called when a closing Bracket, ")" given,
+ *   it will check has "(" in the stack or not.
+ * When there had no open Bracket, "(",
+ *  an Error: CANNOT_PAIR_THE_BRACKET will be thrown.
+ *
+ * E.g. : opStack                           opStack
+ *        ---------                         ---------
+ *  head-->  "(" <---- openBracket found,   head-->  "*"
+ *            |        no error throw.                 |
+ *           \/                                       \/
+ *          "-"                             tail-->  "+"
+ *           |                                        |
+ *          \/                                       \/
+ * tail--> "*"                                     NULL <--- No openBracket found,
+ *          |                                               Error will be thrown
+ *         \/
+ *        NULL
+ */
 void checkOpenBracketInStack(List *operatorStack)
 {
   Element *head = NULL;
   head = operatorStack->head;
 
-  // printf("head)->symbol) = %s\n", ((OperatorToken *)stackTemp->head->data)->symbol);
-  // printf("head)->symbol) = %s\n", ((OperatorToken *)operatorStack->head->data)->symbol);
-  // printf("head->next = %d\n", operatorStack->head->next);
-
-  // printf("head)->symbol) = %s\n", ((OperatorToken *)head->data)->symbol);
-  // printf("next) = %d\n", head->next);
   while((int) *((OperatorToken *)head->data)->symbol != '(' && head->next != NULL)
-  {
-    // printf("head)->symbol) = %s\n", ((OperatorToken *)head->data)->symbol);
     head = head->next;
-
-  }
 
   if((int) *((OperatorToken *)head->data)->symbol != '(' && head->next == NULL)
     throwError("Hey! The bracket cannot be paired.", CANNOT_PAIR_THE_BRACKET);
 }
 
+/*
+ *
+ */ 
 void reductionUntilMetOpenBracket(List *intStack, List *opStack)
 {
   while((int)*((OperatorToken *)opStack->head->data)->symbol != '(')
@@ -183,7 +175,6 @@ int precedenceTokenInOpStackHigher(List *opStack, OperatorToken *token)
 
   if(((OperatorToken *)opStack->head->data)->precedence > token->precedence)
     return 1;
-    // printf("hello higher\n");
 
   if(((OperatorToken *)opStack->head->data)->precedence == token->precedence)
   {
@@ -194,7 +185,6 @@ int precedenceTokenInOpStackHigher(List *opStack, OperatorToken *token)
   }
 
   return 0;
-
 }
 
 void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token)
@@ -203,29 +193,15 @@ void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token)
 
   if(*token->symbol == ')')
   {
-    // printf("Not third lah \n");
     checkOpenBracketInStack(opStack);
     reductionUntilMetOpenBracket(intStack, opStack);
   }
   else
   {
     needReduction = precedenceTokenInOpStackHigher(opStack, token);
-    // printf("need? %d\n", precedenceTokenInOpStackHigher(opStack, token));
-
-    // if(needReduction)
-    // {
-      // reduction(intStack, opStack);
-    // }
-    // printf("**opStack->head = %d \n", opStack->head);
-
-    // needReduction = precedenceTokenInOpStackHigher(opStack, token);
-    // printf("need? %d\n", precedenceTokenInOpStackHigher(opStack, token));
-    // while(precedenceTokenInOpStackHigher(opStack, token))
     while(needReduction)
     {
-      // printf("YEAH!!!\n");
       reduction(intStack, opStack);
-      // needReduction = precedenceTokenInOpStackHigher(opStack, token);
       if(opStack->head == NULL)
         needReduction = 0;
       else
@@ -233,7 +209,6 @@ void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token)
     }
 
     stackPush(opStack, token);
-    // printf("after PUSH need opStack->head = %s \n", ((OperatorToken *)opStack->head->data)->symbol);
   }
 }
 
@@ -244,7 +219,7 @@ Token *shuntingYard()
   List *opStack = stackCreate();
 
   Token *token = _getToken();
-  // printf("precedence = %d\n", ((OperatorToken *)token)->precedence);
+
   while(1)
   {
     if(token->type == TOKEN_OPERATOR_TYPE)
@@ -256,39 +231,19 @@ Token *shuntingYard()
     switch(whichPosition)
     {
       case 1: possibleForPrefixAndInteger(&token, &whichPosition); break;
-      // case 2: secondPosition(token, &whichPosition); break;
       case 2: possibleForPostfixAndInfix(token, &whichPosition); break;
-      // case 4: fourthPosition(token, &whichPosition); break;
       default: throwError("Hey! Unknown error!", UNKNOWN_ERROR); break;
     }
 
     if(token->type == TOKEN_OPERATOR_TYPE && opStack->head == NULL)
-    {
-      // printf("$$$$$NULL head\n");
-      // printf("token->symbol) = %s\n", ((OperatorToken *)token)->symbol);
-      // printf("head)->symbol) = %s\n", ((OperatorToken *)token)->symbol);
       stackPush(opStack, token);
-    }
     else if(token->type == TOKEN_OPERATOR_TYPE && opStack->head != NULL)
-    {
-      // printf("NOT NULL\n");
-      // printf("token->symbol) = %s\n", ((OperatorToken *)token)->symbol);
       tryPushToOpStack(intStack, opStack, (OperatorToken *)token);
-      // printf("*&&*opStack->head = %d \n", opStack->head);
-      // printf("opStack->next %d\n", opStack->head->next);
-      // printf("head)->next->symbol = %s\n", ((OperatorToken *)opStack->head->next->data)->symbol);
-    }
     else if(token->type == TOKEN_INTEGER_TYPE)
-    {
-      // printf("INT\n");
       stackPush(intStack, token);
-    }
     else
       throwError("Hey! I cannot handle this kind of Token Type yet!", UNHANDLE_TOKEN_TYPE);
 
-    // printf("After posiFunc = %d \n", whichPosition);
-    // printf("opStacl->head->symbol %s\n", ((OperatorToken *)opStack->head->data)->symbol);
-    // printf("opStack->next %d\n", opStack->head->next);
     token = _getToken();
   }
 
