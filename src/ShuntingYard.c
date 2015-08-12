@@ -107,16 +107,11 @@ void possibleForPostfixAndInfix(Token *token, int *whichPosition)
   if(token->type == TOKEN_OPERATOR_TYPE)
   {
     if(((OperatorToken *)token)->arity == POSTFIX)
-    {
       *whichPosition = 2;
-    }
+    else if(((OperatorToken *)token)->arity == INFIX)
+       *whichPosition = 1;
     else
-    {
-      if(((OperatorToken *)token)->arity == INFIX)
-        *whichPosition = 1;
-      else
         throwError("Hey! Expected either POSTFIX or INFIX operator was not.", NEITHER_POSTFIX_NOR_INFIX);
-    }
   }
   else
     throwError("Hey! Expected an operator was not.", NOT_OPERATOR_AFTER_NUMBER);
@@ -151,11 +146,56 @@ void checkOpenBracketInStack(List *operatorStack)
 
   if((int) *((OperatorToken *)head->data)->symbol != '(' && head->next == NULL)
     throwError("Hey! The bracket cannot be paired.", CANNOT_PAIR_THE_BRACKET);
+  
 }
 
-/*
- *
- */ 
+/* Check is there any open Bracket unpaired and left in opStack.
+ * Return 1 is there is openBracket left,
+ * otherwise a 0 will be returned.
+ */
+int openBracketLeft(List *operatorStack)
+{
+  Element *head = NULL;
+  head = operatorStack->head;
+
+  while((int) *((OperatorToken *)head->data)->symbol != '(' && head->next != NULL)
+    head = head->next;
+  
+  if((int) *((OperatorToken *)head->data)->symbol == '(')
+    return 1;
+
+  if((int) *((OperatorToken *)head->data)->symbol != '(' && head->next == NULL)
+    return 0;
+  
+  if(head == NULL)
+    return 0;
+}
+
+/* Check is there any close Bracket unpaired and left in opStack.
+ * Return 1 is there is closeBracket left,
+ * otherwise a 0 will be returned.
+ */
+int closeBracketLeft(List *operatorStack)
+{
+  Element *head = NULL;
+  head = operatorStack->head;
+  
+  while((int) *((OperatorToken *)head->data)->symbol != ')' && head->next != NULL)
+    head = head->next;
+  
+  if((int) *((OperatorToken *)head->data)->symbol == ')')
+    return 1;
+
+  if((int) *((OperatorToken *)head->data)->symbol != ')' && head->next == NULL)
+    return 0;
+  
+  if(head == NULL)
+    return 0;
+}
+
+/*This function is using when an closing bracket is met,
+ *  it will reduct the opStack and intStack until met an open Bracket.
+ */
 void reductionUntilMetOpenBracket(List *intStack, List *opStack)
 {
   while((int)*((OperatorToken *)opStack->head->data)->symbol != '(')
@@ -165,6 +205,12 @@ void reductionUntilMetOpenBracket(List *intStack, List *opStack)
     stackRemove(opStack);
 }
 
+/* Compare the precedence of the token from getToken with the token within opStack.
+ * Return 0 if the token in opStack is openBracket, '(' .
+ * Return 0 if there is no any token in opStack.
+ * Return 1 if the precedence of token of the head of opStack higher than the precedence of token,
+ * otherwise, return a 0.
+ */
 int precedenceTokenInOpStackHigher(List *opStack, OperatorToken *token)
 {
   if((int)*((OperatorToken *)opStack->head->data)->symbol == '(')
@@ -187,6 +233,11 @@ int precedenceTokenInOpStackHigher(List *opStack, OperatorToken *token)
   return 0;
 }
 
+/*  This function will be used When an OperatorToken was get,
+ *  it will check the attributes of the token, 
+ *  then try to push to the opStack.
+ *
+ */
 void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token)
 {
   int needReduction = -1;
@@ -212,6 +263,10 @@ void tryPushToOpStack(List *intStack, List *opStack, OperatorToken *token)
   }
 }
 
+
+/* main program
+ *
+ */
 Token *shuntingYard()
 {
   int whichPosition = 1;
@@ -234,7 +289,7 @@ Token *shuntingYard()
       case 2: possibleForPostfixAndInfix(token, &whichPosition); break;
       default: throwError("Hey! Unknown error!", UNKNOWN_ERROR); break;
     }
-
+    
     if(token->type == TOKEN_OPERATOR_TYPE && opStack->head == NULL)
       stackPush(opStack, token);
     else if(token->type == TOKEN_OPERATOR_TYPE && opStack->head != NULL)
@@ -247,6 +302,12 @@ Token *shuntingYard()
     token = _getToken();
   }
 
+  if(openBracketLeft(opStack))
+    throwError("Hey! The bracket cannot be paired.", CANNOT_PAIR_THE_BRACKET);
+  if(closeBracketLeft(opStack))
+    throwError("Hey! The bracket cannot be paired.", CANNOT_PAIR_THE_BRACKET);
+
+    
   while(opStack->head != NULL)
     reduction(intStack, opStack);
 
@@ -254,6 +315,7 @@ Token *shuntingYard()
     throwError("Hey! Unknown error!", UNKNOWN_ERROR);
   if(intStack-> head != intStack->tail)
     throwError("Hey! Unknown error!", UNKNOWN_ERROR);
+
 
   return (intStack->head->data);
 }

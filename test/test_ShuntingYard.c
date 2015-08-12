@@ -1006,3 +1006,232 @@ void test_shuntingYard_given_expression_with_two_integer_should_catch_the_error(
     freeError(err);
   }
 }
+
+/*   6 + * 5
+ *       ^
+ *    error
+ */
+void test_shuntingYard_given_plus_multiply_symbol_should_catch_the_error(void)
+{
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(6);
+  getToken_ExpectAndReturn((Token *)value1);
+
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("+");
+  getToken_ExpectAndReturn((Token *)op1);
+
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("*");
+  getToken_ExpectAndReturn((Token *)op2);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  ErrorObject *err;
+  Try
+  {
+    token = shuntingYard();
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL_STRING("Hey! This symbol is not belong to prefix type.", err->errorMsg);
+    TEST_ASSERT_EQUAL(FAIL_TO_CONVERT_TO_PREFIX, err->errorCode);
+
+    freeError(err);
+  }
+}
+
+
+/*  ( ( 6 - 3 ) $
+ *    ^
+ *  error
+ */
+void test_shuntingYard_given_double_open_bracket_with_only_one_closing_bracket_should_catch_the_error(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("(");
+  getToken_ExpectAndReturn((Token *)op1);
+  
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken("(");
+  getToken_ExpectAndReturn((Token *)op2);
+  
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(6);
+  getToken_ExpectAndReturn((Token *)value1);
+  
+  OperatorToken *op3 = (OperatorToken*)createOperatorToken("-");
+  getToken_ExpectAndReturn((Token *)op3);
+
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(3);
+  getToken_ExpectAndReturn((Token *)value2);
+
+  OperatorToken *op4 = (OperatorToken*)createOperatorToken(")");
+  getToken_ExpectAndReturn((Token *)op4);
+    
+  OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  ErrorObject *err;
+  Try
+  {
+    token = shuntingYard();
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL_STRING("Hey! The bracket cannot be paired.", err->errorMsg);
+    TEST_ASSERT_EQUAL(CANNOT_PAIR_THE_BRACKET, err->errorCode);
+
+    freeError(err);
+  }
+
+}
+
+/*  ( 6 - 3 ) )
+ *            ^
+ *          error
+ */
+void test_shuntingYard_given_double_close_bracket_with_only_one_open_bracket_should_catch_the_error(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("(");
+  getToken_ExpectAndReturn((Token *)op1);
+  
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(6);
+  getToken_ExpectAndReturn((Token *)value1);
+  
+  OperatorToken *op3 = (OperatorToken*)createOperatorToken("-");
+  getToken_ExpectAndReturn((Token *)op3);
+
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(3);
+  getToken_ExpectAndReturn((Token *)value2);
+
+  OperatorToken *op4 = (OperatorToken*)createOperatorToken(")");
+  getToken_ExpectAndReturn((Token *)op4);
+    
+  OperatorToken *op2 = (OperatorToken*)createOperatorToken(")");
+  getToken_ExpectAndReturn((Token *)op2);
+
+  OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  ErrorObject *err;
+  Try
+  {
+    token = shuntingYard();
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL_STRING("Hey! The bracket cannot be paired.", err->errorMsg);
+    TEST_ASSERT_EQUAL(CANNOT_PAIR_THE_BRACKET, err->errorCode);
+
+    freeError(err);
+  }
+
+}
+
+/*   6 --  )
+ *         ^
+ *       error
+ */
+void test_shuntingYard_given_one_close_bracket_should_catch_the_error(void)
+{
+  // OperatorToken *op1 = (OperatorToken*)createOperatorToken("(");
+  // getToken_ExpectAndReturn((Token *)op1);
+  
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(6);
+  getToken_ExpectAndReturn((Token *)value1);
+  
+  OperatorToken *op3 = (OperatorToken*)createOperatorToken("--");
+  getToken_ExpectAndReturn((Token *)op3);
+
+  // IntegerToken *value2 = (IntegerToken *)createIntegerToken(3);
+  // getToken_ExpectAndReturn((Token *)value2);
+
+  OperatorToken *op4 = (OperatorToken*)createOperatorToken(")");
+  getToken_ExpectAndReturn((Token *)op4);
+    
+  // OperatorToken *op2 = (OperatorToken*)createOperatorToken(")");
+  // getToken_ExpectAndReturn((Token *)op2);
+
+  // OperatorToken *opEnd = (OperatorToken*)createOperatorToken("$");
+  // getToken_ExpectAndReturn((Token *)opEnd);
+
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  ErrorObject *err;
+  Try
+  {
+    token = shuntingYard();
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL_STRING("Hey! The bracket cannot be paired.", err->errorMsg);
+    TEST_ASSERT_EQUAL(CANNOT_PAIR_THE_BRACKET, err->errorCode);
+
+    freeError(err);
+  }
+}
+
+/*  ! 6 ~ 3 
+ *      ^
+ *     error
+ */
+void test_shuntingYard_given_prefix_after_Integer_should_catch_the_error(void)
+{
+  OperatorToken *op1 = (OperatorToken*)createOperatorToken("!");
+  getToken_ExpectAndReturn((Token *)op1);
+  
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(6);
+  getToken_ExpectAndReturn((Token *)value1);
+  
+  OperatorToken *op3 = (OperatorToken*)createOperatorToken("~");
+  getToken_ExpectAndReturn((Token *)op3);
+
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(3);
+  
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  ErrorObject *err;
+  Try
+  {
+    token = shuntingYard();
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL_STRING("Hey! Expected either POSTFIX or INFIX operator was not.", err->errorMsg);
+    TEST_ASSERT_EQUAL(NEITHER_POSTFIX_NOR_INFIX, err->errorCode);
+
+    freeError(err);
+  }
+
+}
+
+/*   6 @ 3 
+ *     ^
+ *    error
+ */
+void test_shuntingYard_given_illegal_symbol_after_Integer_should_catch_the_error(void)
+{  
+  IntegerToken *value1 = (IntegerToken *)createIntegerToken(6);
+  getToken_ExpectAndReturn((Token *)value1);
+  
+  OperatorToken *op3 = (OperatorToken*)createOperatorToken("@");
+  getToken_ExpectAndReturn((Token *)op3);
+
+  IntegerToken *value2 = (IntegerToken *)createIntegerToken(3);
+  
+  Token *token = malloc(sizeof(OperatorToken) + sizeof(Token *) * 2);
+  ErrorObject *err;
+  Try
+  {
+    token = shuntingYard();
+    TEST_FAIL_MESSAGE("Expected to catch Error here, but didn't.\n");
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL_STRING(("%s is an undefined operator.", op3->symbol), err->errorMsg);
+    TEST_ASSERT_EQUAL(UNDEFINED_OPERATOR, err->errorCode);
+
+    freeError(err);
+  }
+
+}
+

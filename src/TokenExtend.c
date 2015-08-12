@@ -12,7 +12,7 @@ Attributes operatorAttributesTable[] = {
   ['+'] = 		    {INFIX,   LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
   ['-'] = 		    {INFIX,   LEFT_TO_RIGHT, 10, extendTripleCharacterOperator},
   ['!'] = 		    {PREFIX,  RIGHT_TO_LEFT, 12, extendDoubleCharacterOperator},
-  ['~'] = 		    {PREFIX,  RIGHT_TO_LEFT, 12, extendQuadrupleCharacterOperator},
+  ['~'] = 		    {PREFIX,  RIGHT_TO_LEFT, 12, extendSingleCharacterOperator},
   ['*'] = 		    {INFIX,   LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
   ['/'] = 		    {INFIX,   LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
   ['%'] = 		    {INFIX,   LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
@@ -260,7 +260,6 @@ void tryConvertToPrefix(Token ***token)
   }
 
   else
-    throwError("Hey! This symbol is not belong to prefix type.",  \
-                FAIL_TO_CONVERT_TO_PREFIX);
+    throwError("Hey! This symbol is not belong to prefix type.", FAIL_TO_CONVERT_TO_PREFIX);
 }
 
