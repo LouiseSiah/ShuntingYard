@@ -39,8 +39,9 @@ typedef enum {
 typedef enum{
   PREFIX, //-2
   INFIX,	//2*2
-  POSTFIX	//x++
-}Arity;
+  POSTFIX,	//x++
+  NOFIX,
+} Arity;
 
 typedef enum{
   NONE,
@@ -86,7 +87,9 @@ typedef struct{
   uint32_t length;
   char *str;
   char *symbol;
-  Arity arity;
+ 	Arity arity;
+  Associativity assoc;
+  uint32_t precedence;
   Token *token[0];
 } OperatorToken;
 
@@ -98,13 +101,9 @@ typedef struct{
   Token* token;
 }StringObject;
 
-char *createSubString(char *str, int start , int length);
-Token *createIntegerToken(StringObject *strO,int base);
-Token *createOperatorToken(StringObject *strO);
-Token *createStringToken(StringObject *strO);
-Token *createIdentifierToken(StringObject *strO);
-Token *createFloatToken(StringObject *strO);
-Token *createEndStrToken(char *symbol);
+Token *createOperatorToken(char *symbol);
+Token *createIntegerToken(int value);
+
 
 #endif // Token_H
 
