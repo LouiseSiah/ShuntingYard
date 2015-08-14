@@ -1,82 +1,110 @@
 #ifndef Token_H
 #define Token_H
 
+
+//Library
 #include <stdint.h>
-//size of Token = 12
-//IntegerToken = 16
-//FloatToken = 24
-//IdentifierToken = 16
-//StringToken = 16
-//OperatorToken = 20
-typedef enum
-{
-	TOKEN_UNKNOWN_TYPE,
-	TOKEN_INTEGER_TYPE,
-	TOKEN_OPERATOR_TYPE,
-	TOKEN_FLOAT_TYPE,
-	TOKEN_STRING_TYPE,
-	TOKEN_IDENTIFIER_TYPE,
-} TokenType;
 
-typedef enum
-{
-	PREFIX, //-2
-	INFIX,	//2*2
-	POSTFIX,	//x++
-  NOFIX,
-} Arity;
+#define OCTAL 8
+#define DECIMAL 10
+#define HEXDECIMAL 16
 
-typedef enum
-{
-	NONE,
-	LEFT_TO_RIGHT,
-	RIGHT_TO_LEFT,
-} Associativity;
 
-typedef struct
-{
-	TokenType type;
+
+typedef enum{
+  INITIAL_STATE,
+  INTEGER_STATE,
+  IDENTIFIER_STATE,
+  STRING_STATE,
+  OPERATOR_STATE,
+  FLOATING_STATE,
+  TWINASSIGN_STATE,
+  DECIMALPOINT_STATE,
+  EXPONENT_STATE,
+  NEGPOSEXPONENT_STATE,
+  HEXDECIMAL_STATE,
+  OCTAL_STATE,
+  UNKNOWN_STATE
+}TokenState;
+
+typedef enum {
+  TOKEN_UNKNOWN_TYPE,
+  TOKEN_INTEGER_TYPE,
+  TOKEN_OPERATOR_TYPE,
+  TOKEN_FLOAT_TYPE,
+  TOKEN_STRING_TYPE,
+  TOKEN_IDENTIFIER_TYPE,
+}TokenType;
+
+typedef enum{
+  PREFIX, //-2
+  INFIX,	//2*2
+  POSTFIX	//x++
+}Arity;
+
+typedef enum{
+  NONE,
+  LEFT_TO_RIGHT,
+  RIGHT_TO_LEFT,
+}Associativity;                                                                                                                                           
+
+typedef struct{
+  TokenType type;
   uint32_t startColumn;
   uint32_t length;
-} Token;
+  char *str;
+}Token;
 
-typedef struct 
-{
-	TokenType type;
+typedef struct{
+  TokenType type;
   uint32_t startColumn;
   uint32_t length;
-	int value;
-} IntegerToken;
+  int value;
+  char *str;
+}IntegerToken;
 
-typedef struct 
-{
-	TokenType type;
+typedef struct{
+  TokenType type;
   uint32_t startColumn;
   uint32_t length;
-	double value;
-} FloatToken;
+  double value;
+  char *str;
+}FloatToken;
 
-typedef struct 
-{
-	TokenType type;
+typedef struct{
+  TokenType type;
   uint32_t startColumn;
   uint32_t length;
-	char *name;
-} IdentifierToken, StringToken;
+  char *name;
+  char *str;
+  Token *token;
+}IdentifierToken,StringToken;
 
-typedef struct 
-{
-	TokenType type;
+typedef struct{
+  TokenType type;
   uint32_t startColumn;
   uint32_t length;
-	char *symbol;
-	Arity arity;
-  Associativity assoc;
-  uint32_t precedence;
-	Token *token[0];
+  char *str;
+  char *symbol;
+  Arity arity;
+  Token *token[0];
 } OperatorToken;
 
-Token *createOperatorToken(char *symbol);
-Token *createIntegerToken(int value);
+typedef struct{
+  TokenType type;
+  char *str;  
+  int index;	
+  int startIndex;
+  Token* token;
+}StringObject;
+
+char *createSubString(char *str, int start , int length);
+Token *createIntegerToken(StringObject *strO,int base);
+Token *createOperatorToken(StringObject *strO);
+Token *createStringToken(StringObject *strO);
+Token *createIdentifierToken(StringObject *strO);
+Token *createFloatToken(StringObject *strO);
+Token *createEndStrToken(char *symbol);
 
 #endif // Token_H
+
