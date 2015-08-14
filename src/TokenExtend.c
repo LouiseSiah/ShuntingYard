@@ -4,7 +4,7 @@
 #include "ErrorObject.h"
 #include "CException.h"
 #include "StringTokenizer.h"
-
+//alignment
 /* Table of attributes about the expression operators
  */
 Attributes operatorAttributesTable[] = {
@@ -16,31 +16,31 @@ Attributes operatorAttributesTable[] = {
   ['*'] =         {INFIX,   LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
   ['/'] =         {INFIX,   LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
   ['%'] =         {INFIX,   LEFT_TO_RIGHT, 11, extendDoubleCharacterOperator},
-  ['<'] =         {INFIX,	  LEFT_TO_RIGHT,  8, extendQuadrupleCharacterOperator},
-  ['>'] =         {INFIX,	  LEFT_TO_RIGHT,  8, extendQuadrupleCharacterOperator},
-  ['='] =         {INFIX,	  RIGHT_TO_LEFT,  1, extendDoubleCharacterOperator},
-  ['&'] =         {INFIX,	  LEFT_TO_RIGHT,  6, extendTripleCharacterOperator},
-  ['^'] =         {INFIX,	  LEFT_TO_RIGHT,  5, extendDoubleCharacterOperator},
-  ['|'] =         {INFIX,	  LEFT_TO_RIGHT,  4, extendTripleCharacterOperator},
+  ['<'] =         {INFIX,   LEFT_TO_RIGHT,  8, extendQuadrupleCharacterOperator},
+  ['>'] =         {INFIX,   LEFT_TO_RIGHT,  8, extendQuadrupleCharacterOperator},
+  ['='] =         {INFIX,   RIGHT_TO_LEFT,  1, extendDoubleCharacterOperator},
+  ['&'] =         {INFIX,   LEFT_TO_RIGHT,  6, extendTripleCharacterOperator},
+  ['^'] =         {INFIX,   LEFT_TO_RIGHT,  5, extendDoubleCharacterOperator},
+  ['|'] =         {INFIX,   LEFT_TO_RIGHT,  4, extendTripleCharacterOperator},
   ['a' ... 'z'] = {NOFIX,   NONE,          -1, errorCharactorOperator},
   ['A' ... 'Z'] = {NOFIX,   NONE,          -1, errorCharactorOperator},
   [48  ...  57] = {NOFIX,   NONE,          -1, errorCharactorOperator},
   [')'] =         {POSTFIX, NONE,           0, extendSingleCharacterOperator},
-  ['['] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  [']'] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  ['$'] =         {NOFIX,	  NONE,           0, extendSingleCharacterOperator},
-  ['#'] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  ['{'] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  ['}'] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  ['@'] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  ['?'] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  ['.'] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  [','] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  [';'] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  ['"'] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  ['\'']=         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  ['`'] =         {NOFIX,	  NONE,          -1, errorCharactorOperator},
-  ['\\']=         {NOFIX,	  NONE,          -1, errorCharactorOperator},
+  ['['] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  [']'] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  ['$'] =         {NOFIX,   NONE,           0, extendSingleCharacterOperator},
+  ['#'] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  ['{'] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  ['}'] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  ['@'] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  ['?'] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  ['.'] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  [','] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  [';'] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  ['"'] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  ['\'']=         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  ['`'] =         {NOFIX,   NONE,          -1, errorCharactorOperator},
+  ['\\']=         {NOFIX,   NONE,          -1, errorCharactorOperator},
 };
 
 /* Function for the operator that had only one possibility.
